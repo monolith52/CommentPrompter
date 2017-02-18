@@ -26,9 +26,19 @@ public class CommentChecker implements Runnable {
 	protected String id;
 	protected boolean isRunning = false;
 	protected int currentNumber = 0;
+
+	protected List<CommentFoundListener> commentFoundListeners = new ArrayList<CommentFoundListener>();
 	
 	public CommentChecker(String id) {
 		this.id = id;
+	}
+	
+	public void addCommentFoundListener(CommentFoundListener listener) {
+		commentFoundListeners.add(listener);
+	}
+	
+	public void removeCommentFoundListener(CommentFoundListener listener) {
+		commentFoundListeners.remove(listener);
 	}
 	
 	private String getTargetUrl(String id) {
@@ -82,6 +92,7 @@ public class CommentChecker implements Runnable {
 				String response = SafeConnection.getPage(getTargetUrl(id), HOST, ENCODING);
 				List<Comment> comments = parseComments(response);
 				updateCurrentNumber(comments);
+				commentFoundListeners.forEach(listener -> listener.commentFound(comments));
 				
 				try {Thread.sleep(3000);} catch (InterruptedException e) {}
 			} catch (IOException e) {

@@ -10,8 +10,10 @@ import monolith52.comprompt.livetube.IdDetector;
 
 public class Application extends JFrame {
 	private static final long serialVersionUID = 1L;
-
 	public Application() {
+	}
+	
+	public void init() {
 		setTitle("Comment Prompter");
 		setSize(400, 300);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -19,25 +21,28 @@ public class Application extends JFrame {
 	}
 	
 	public static void main(String[] args) {
+		Application app = new Application();
+		CommentView commentView = new CommentView();
+
 		SwingUtilities.invokeLater(new Runnable(){
 			@Override
 			public void run() {
-				new Application();
-				
-				String id = null;
-				try {
-					IdDetector detector = new IdDetector("http://livetube.cc/kaike/%E4%B8%89%E5%9B%BD%E5%BF%9713%EF%BC%B0%EF%BC%AB%E5%8A%89%E5%BA%A6");
-					id = detector.detect();
-					
-					CommentChecker checker = new CommentChecker(id);
-					new Thread(checker).start();
-				} catch (IOException e) {
-					assert false: "id detection failed.";
-				}
-				
+				app.init();
+				app.add(commentView);
+				new Thread(commentView).start();
 			}
 		});
-		
+
+		String id = null;
+		try {
+			IdDetector detector = new IdDetector("http://livetube.cc/%E3%81%97%E3%81%B6%E3%82%8A%E3%82%80/%E3%81%B3%E3%81%8A%E3%81%97%E3%82%87%EF%BD%83%EF%BD%8B%E3%80%80%E5%88%9D%E8%A6%8B(2)");
+			id = detector.detect();
+			CommentChecker checker = new CommentChecker(id);
+			checker.addCommentFoundListener(commentView);
+			checker.run();
+		} catch (IOException e) {
+			assert false: "id detection failed.";
+		}
 	}
 
 }
