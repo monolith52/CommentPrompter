@@ -9,6 +9,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import monolith52.comprompt.config.ApplicationMenu;
+import monolith52.comprompt.config.Configure;
 import monolith52.comprompt.livetube.CommentChecker;
 import monolith52.comprompt.livetube.IdDetector;
 
@@ -16,6 +18,8 @@ public class Application extends JFrame {
 	private static final long serialVersionUID = 1L;
 	protected static DataFlavor IMPORTABLE_FLAVOR = new DataFlavor(String.class, "text/plain");
 	
+	Configure config;
+	ApplicationMenu menu;
 	CommentView commentView;
 	CommentChecker commentChecker;
 	String targetUrl;
@@ -25,6 +29,7 @@ public class Application extends JFrame {
 	}
 	
 	public void init() {
+		
 		setTitle("Comment Prompter");
 		setSize(400, 300);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,6 +38,13 @@ public class Application extends JFrame {
 		commentView = new CommentView();
 		add(commentView);
 		new Thread(commentView).start();
+		
+		config = new Configure();
+		config.addConfigureChangedListener(commentView);
+
+		menu = new ApplicationMenu(config);
+		menu.init();
+		setJMenuBar(menu);
 
 		setTransferHandler(new DropHandler());
 	}
