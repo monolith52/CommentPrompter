@@ -62,8 +62,6 @@ public class CommentChecker implements Runnable {
 		List<Comment> comments = new ArrayList<Comment>();
 		
 		// エントリーごとに分割
-		String[] splited = response.split("<div style=\"background-color: #eee;\">");
-		splited = Arrays.copyOfRange(splited, 1, splited.length);
 		Stream<String> entries = Arrays.stream(response.split("<div style=\"background-color: #eee;\">"));
 		
 		// 要素の抜き出し
@@ -79,7 +77,7 @@ public class CommentChecker implements Runnable {
 		
 		Optional<Comment> latest = comments.stream().max(Comparator.comparingInt(comment -> comment.getNumber()));
 		if (latest.isPresent()) {
-			currentNumber = Math.max(currentNumber, latest.get().getNumber()) + 1;
+			currentNumber = Math.max(currentNumber, latest.get().getNumber());
 			System.out.println("Current number is updated to: " + currentNumber);
 		}
 	}
@@ -90,6 +88,8 @@ public class CommentChecker implements Runnable {
 		while (isRunning) {
 			try {
 				String response = SafeConnection.getPage(getTargetUrl(id), HOST, ENCODING);
+				if (!isRunning) break;
+				
 				List<Comment> comments = parseComments(response);
 				updateCurrentNumber(comments);
 				commentFoundListeners.forEach(listener -> listener.commentFound(comments));
@@ -101,9 +101,12 @@ public class CommentChecker implements Runnable {
 				stop();
 			}
 		}
+		
+		System.out.println("Stopped checker for: " + id);
 	}
 	
 	public void stop() {
+		System.out.println("Stopping checker for: " + id);
 		isRunning = false;
 	}
 }

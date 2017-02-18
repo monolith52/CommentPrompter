@@ -18,8 +18,6 @@ public class IdDetector {
 	}
 	
 	public String detect() throws IOException {
-		String id = null;
-		
 		String response = SafeConnection.getPage(url, HOST, ENCODING);
 		Matcher match = IDPATTERN.matcher(response);
 		if(!match.find()) {

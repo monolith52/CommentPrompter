@@ -1,8 +1,5 @@
 package monolith52.comprompt;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import monolith52.comprompt.animation.Animation;
 
 public class Comment {

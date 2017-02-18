@@ -37,7 +37,7 @@ public class CommentView extends JPanel implements Runnable, CommentFoundListene
 			g.setColor(color);
 			int x = 10 + ani.getX();
 			int y = (comments.size()-i)*20 + ani.getY();
-			g.drawString(comment.getText(), x, (comments.size()-i)*20);
+			g.drawString(comment.getText(), x, y);
 		}
 	}
 
