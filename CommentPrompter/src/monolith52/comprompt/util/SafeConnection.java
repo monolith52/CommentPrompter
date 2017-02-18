@@ -18,12 +18,13 @@ public class SafeConnection {
 			throw new IOException(e);
 		}
 		
+		// 指定したホスト外への攻撃防止
 		if (urlobj == null || 
 				urlobj.getHost() == null || !urlobj.getHost().endsWith(hostbase)) {
 			assert false: "invalid url";
 		}
 		
-		// ループした場合の攻撃防止
+		// 誤ってループした場合の攻撃防止
 		try {Thread.sleep(200);} catch (InterruptedException e) {}
 		System.out.println("HTTP GET: " + url);
 		

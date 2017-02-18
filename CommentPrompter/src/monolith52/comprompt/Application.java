@@ -14,6 +14,7 @@ import monolith52.comprompt.livetube.IdDetector;
 
 public class Application extends JFrame {
 	private static final long serialVersionUID = 1L;
+	protected static DataFlavor IMPORTABLE_FLAVOR = new DataFlavor(String.class, "text/plain");
 	
 	CommentView commentView;
 	CommentChecker commentChecker;
@@ -40,9 +41,8 @@ public class Application extends JFrame {
 		private static final long serialVersionUID = 1L;
 		
 		protected Object importUrlText(TransferSupport support) {
-			DataFlavor flavor = new DataFlavor(String.class, "text/plain");
 			try {
-				return support.getTransferable().getTransferData(flavor);
+				return support.getTransferable().getTransferData(IMPORTABLE_FLAVOR);
 			} catch (UnsupportedFlavorException | IOException e) {
 				e.printStackTrace();
 				return null;
@@ -51,27 +51,23 @@ public class Application extends JFrame {
 
 		@Override
 		public boolean canImport(TransferSupport support) {
-			DataFlavor flavor = new DataFlavor(String.class, "text/plain");
-			return Arrays.stream(support.getDataFlavors()).anyMatch(f -> flavor.equals(f));
+			return Arrays.stream(support.getDataFlavors()).anyMatch(f -> IMPORTABLE_FLAVOR.equals(f));
 		}
 
 		@Override
 		public boolean importData(TransferSupport support) {
 			Object data = importUrlText(support);
-			String url = null;
-			
-			if (data != null && data instanceof String) url = (String)data;
-			if (url == null) {
+			if (data == null || !(data instanceof String)) {
 				System.out.println("invalid import data flavors: " + data.getClass().getName());
 				return false;
 			}
 			
-			System.out.println("Accept import data: " + url);
-			final String target = url;
+			System.out.println("Accept import data: " + data);
+			final String url = (String)data;
 			new Thread(new Runnable(){
 				@Override
 				public void run() {
-					start(target);
+					start(url);
 				}
 			}).start();
 			return true;
@@ -106,11 +102,10 @@ public class Application extends JFrame {
 	}
 	
 	public static void main(String[] args) {
-		Application app = new Application();
-
 		SwingUtilities.invokeLater(new Runnable(){
 			@Override
 			public void run() {
+				Application app = new Application();
 				app.init();
 			}
 		});

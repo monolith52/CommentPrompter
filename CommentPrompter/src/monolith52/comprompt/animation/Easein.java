@@ -22,13 +22,11 @@ public class Easein extends AnimationImpl {
 
 	@Override
 	public int getY() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getAlpha() {
-		// TODO Auto-generated method stub
 		return Math.min(0xFF, currentStep * 0xFF / maxStep());
 	}
 }

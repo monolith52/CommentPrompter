@@ -18,6 +18,7 @@ public class CommentChecker implements Runnable {
 	public final static String HOST = "livetube.cc";
 	public final static String ENCODING = "UTF-8";
 	
+	protected final static String DELIMITER_ENTRY	= "<div style=\"background-color: #eee;\">";
 	protected final static Pattern PATTERN_NUMBER 	= Pattern.compile("\r\n([0-9]+) :  ");
 	protected final static Pattern PATTERN_NAME 	= Pattern.compile("<span style=\"font-size:1em;color:green; font-weight:bolder;\">(.+)</span>");
 	protected final static Pattern PATTERN_DATETIME = Pattern.compile("<span style=\"\">([0-9]{1,2}/[0-9]{1,2} [0-9]{1,2}:[0-9]{2}:[0-9]{2})</span><br />");
@@ -62,9 +63,10 @@ public class CommentChecker implements Runnable {
 		List<Comment> comments = new ArrayList<Comment>();
 		
 		// エントリーごとに分割
-		Stream<String> entries = Arrays.stream(response.split("<div style=\"background-color: #eee;\">"));
+		Stream<String> entries = Arrays.stream(response.split(DELIMITER_ENTRY));
 		
 		// 要素の抜き出し
+		// 先頭にはエントリが含まれないので１件スキップしている
 		entries.skip(1).forEach(entry -> {
 			comments.add(parseComment(entry));
 		});
