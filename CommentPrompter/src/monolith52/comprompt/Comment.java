@@ -1,11 +1,25 @@
 package monolith52.comprompt;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import monolith52.comprompt.animation.Animation;
+
 public class Comment {
 	int number;
 	String icon;
 	String name;
 	String datetime;
 	String text;
+	Animation animation;
+	
+	public void setAnimation(Animation animation) {
+		this.animation = animation;
+	}
+	
+	public Animation getAnimation() {
+		return animation;
+	}
 	
 	public String getDatetime() {
 		return datetime;

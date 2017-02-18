@@ -35,7 +35,7 @@ public class Application extends JFrame {
 
 		String id = null;
 		try {
-			IdDetector detector = new IdDetector("http://livetube.cc/%E3%81%97%E3%81%B6%E3%82%8A%E3%82%80/%E3%81%B3%E3%81%8A%E3%81%97%E3%82%87%EF%BD%83%EF%BD%8B%E3%80%80%E5%88%9D%E8%A6%8B(2)");
+			IdDetector detector = new IdDetector("http://livetube.cc/YuiTomo/YuiTomo%E3%81%AETheWildEight(3)");
 			id = detector.detect();
 			CommentChecker checker = new CommentChecker(id);
 			checker.addCommentFoundListener(commentView);

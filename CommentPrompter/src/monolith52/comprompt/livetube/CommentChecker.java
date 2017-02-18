@@ -79,7 +79,7 @@ public class CommentChecker implements Runnable {
 		
 		Optional<Comment> latest = comments.stream().max(Comparator.comparingInt(comment -> comment.getNumber()));
 		if (latest.isPresent()) {
-			currentNumber = latest.get().getNumber() + 1;
+			currentNumber = Math.max(currentNumber, latest.get().getNumber()) + 1;
 			System.out.println("Current number is updated to: " + currentNumber);
 		}
 	}
