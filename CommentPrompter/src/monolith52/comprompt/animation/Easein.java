@@ -2,11 +2,12 @@ package monolith52.comprompt.animation;
 
 public class Easein extends AnimationImpl {
 
-	protected int length;
+	protected int dx, dy;
 	
-	public Easein(int fps, int time, int length) {
+	public Easein(int fps, int time, int dx, int dy) {
 		super(fps, time);
-		this.length = length;
+		this.dx = dx;
+		this.dy = dy;
 	}
 	
 	public float getCurrent() {
@@ -16,12 +17,12 @@ public class Easein extends AnimationImpl {
 	
 	@Override
 	public int getX() {
-		return (int)(length * getCurrent());
+		return (int)(dx * getCurrent());
 	}
 
 	@Override
 	public int getY() {
-		return 0;
+		return (int)(dy * getCurrent());
 	}
 
 	@Override

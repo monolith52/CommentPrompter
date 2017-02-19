@@ -25,7 +25,7 @@ public class SafeConnection {
 		}
 		
 		// 誤ってループした場合の攻撃防止
-		try {Thread.sleep(200);} catch (InterruptedException e) {}
+		ThreadUtil.sleep(200);
 		System.out.println("HTTP GET: " + url);
 		
 		HttpURLConnection con = (HttpURLConnection)urlobj.openConnection();

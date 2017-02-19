@@ -13,6 +13,7 @@ import monolith52.comprompt.Comment;
 import monolith52.comprompt.util.MatchUtil;
 import monolith52.comprompt.util.SafeConnection;
 import monolith52.comprompt.util.StripTagsTransformer;
+import monolith52.comprompt.util.ThreadUtil;
 
 public class CommentChecker implements Runnable {
 
@@ -97,23 +98,31 @@ public class CommentChecker implements Runnable {
 				String response = SafeConnection.getPage(getTargetUrl(id), HOST, ENCODING);
 				if (!isRunning) break;
 				
-				List<Comment> comments = parseComments(response);
+				List<Comment> fullCommnets = parseComments(response);
+				
+				// 一度に取得する件数に制限を掛ける
+				// これ以上一度に取得すると表示漏れが発生する
+				final List<Comment> comments = (fullCommnets.size() > 50) ?
+						fullCommnets.subList(fullCommnets.size() - 50, fullCommnets.size()) : fullCommnets;
+
+				// 最新コメ番号を控える
 				updateCurrentNumber(comments);
 				
+				// 表示用の加工を行う
 				comments.forEach(this::transformComment);
 				
-				// 一括追加
+				// 一括通知
 				commentFoundListeners.forEach(listener -> listener.commentFound(comments));
 				
-				// TODO: 逐次追加　あんまりなめらかに見えないので縦方向のスライドは要検討
+				// 逐次通知
 //				comments.forEach(comment -> {
-//					try {Thread.sleep(100);} catch (InterruptedException e) {}
+//					ThreadUtil.sleep(100);
 //					commentFoundListeners.forEach(listener -> listener.commentFound(Arrays.asList(new Comment[]{comment})));
 //				});
 				
-				try {Thread.sleep(3000);} catch (InterruptedException e) {}
+				ThreadUtil.sleep(3000);
 			} catch (IOException e) {
-				try {Thread.sleep(500);} catch (InterruptedException ee) {}
+				ThreadUtil.sleep(500);
 				e.printStackTrace();
 				stop();
 			}

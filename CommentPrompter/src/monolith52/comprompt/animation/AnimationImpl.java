@@ -4,7 +4,7 @@ abstract public class AnimationImpl implements Animation{
 	protected int fps;
 	protected int time;
 	protected int currentStep = 0;
-	boolean isFinished = false;
+	boolean finished = false;
 	protected Runnable onFinish;
 	
 	public AnimationImpl(int fps, int time) {
@@ -14,11 +14,11 @@ abstract public class AnimationImpl implements Animation{
 
 	@Override
 	public void step() {
-		if (isFinished) return;
+		if (finished) return;
 		currentStep ++;
 		if (currentStep >= maxStep()) {
-			isFinished = true;
-			onFinish.run();
+			finished = true;
+			if (onFinish != null) onFinish.run();
 		}
 	}
 	
@@ -32,5 +32,9 @@ abstract public class AnimationImpl implements Animation{
 	
 	public void setOnFinish(Runnable onFinish) {
 		this.onFinish = onFinish;
+	}
+	
+	public boolean isFinished() {
+		return finished;
 	}
 }

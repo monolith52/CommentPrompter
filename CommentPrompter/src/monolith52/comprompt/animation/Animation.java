@@ -6,4 +6,5 @@ public interface Animation {
 	public int getY();
 	public int getAlpha();
 	public void setOnFinish(Runnable onFinish);
+	public boolean isFinished();
 }
