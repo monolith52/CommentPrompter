@@ -1,5 +1,6 @@
 package monolith52.comprompt;
 
+import java.awt.Cursor;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
@@ -79,14 +80,16 @@ public class Application extends JFrame {
 			new Thread(new Runnable(){
 				@Override
 				public void run() {
-					start(url);
+					startTask(url);
 				}
 			}).start();
 			return true;
 		}
 	}
 	
-	public void start(String url) {
+	public void startTask(String url) {
+		
+		// TODO: 同じURLでの連投をはじいているがユーザに分かりにくい　他の方法をに変更するべき
 		synchronized (targetUrlLock) {
 			if (url.equals(targetUrl)) return;
 			targetUrl = url;
@@ -97,16 +100,24 @@ public class Application extends JFrame {
 		}
 		
 		try {
+			// 画面表示をクリア
+			commentView.reset();
+			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			
+			// IDを取得
 			IdDetector detector = new IdDetector(url);
 			String id = detector.detect();
+			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			
+			// コメントの取得
+			// すでにGUIスレッドではないのでコメントの取得は別スレッドでstartする必要がない
 			synchronized (targetUrlLock) {
 				if (!url.equals(targetUrl)) return;
 				commentChecker = new CommentChecker(id);
-				commentChecker.addCommentFoundListener(commentView);
 			}
-			
-			// すでにGUIスレッドではないので別スレッドでstartする必要がない
+			commentChecker.addCommentFoundListener(commentView);
 			commentChecker.run();
+			
 		} catch (IOException e) {
 			assert false: "id detection failed.";
 		}

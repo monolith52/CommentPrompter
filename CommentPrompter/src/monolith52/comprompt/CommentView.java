@@ -23,6 +23,7 @@ public class CommentView extends JPanel implements Runnable, CommentFoundListene
 	double rad = 0.0d;
 	int fps = 60;
 	long frameinterval = 1000 * 1000 * 1000 / fps;
+	int padding		= 5;
 	Font font 		= Configure.DEFAULT_FONT;
 	Color fontColor = Configure.DEFAULT_FONT_COLOR;
 	Color bgColor 	= Configure.DEFAULT_BG_COLOR;
@@ -40,15 +41,21 @@ public class CommentView extends JPanel implements Runnable, CommentFoundListene
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
 		g.setFont(font);
-		for (int i=Math.max(0, comments.size() - 10); i<comments.size(); i++) {
+		for (int i=comments.size()-1; i>=0; i--) {
 			Comment comment = comments.get(i);
 			Animation ani = comment.getAnimation();
 			Color color = new Color(fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), ani.getAlpha());
 			
 			g.setColor(color);
-			int x = 10 + ani.getX();
-			int y = (comments.size()-i)*font.getSize() + ani.getY();
+			int x = padding;
+			int y = (comments.size()-i) * (font.getSize() + padding);
+			
+			// 画面外に出たらそれ以降を全てスキップ
+			if (y > getHeight() + font.getSize()) break;
+			
+			g.translate(ani.getX(), ani.getY());
 			g.drawString(comment.getText(), x, y);
+			g.translate(-ani.getX(), -ani.getY());
 		}
 	}
 
@@ -88,6 +95,10 @@ public class CommentView extends JPanel implements Runnable, CommentFoundListene
 			bgColor = config.getBgColor();
 			break;
 		}
+	}
+	
+	public void reset() {
+		comments.clear();
 	}
 
 }
