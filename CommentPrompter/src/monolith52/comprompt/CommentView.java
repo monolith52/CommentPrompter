@@ -94,7 +94,7 @@ public class CommentView extends JPanel
 	public void commentFound(List<Comment> newComments) {
 		newComments.forEach(comment -> {
 			System.out.println("New comment found: " + comment.getText());
-			Animation easein = new Easein(fps, 1000, 300);
+			Animation easein = new Easein(fps, 750, 300);
 			Animation fadeout = new Fadeout(fps, 1000, 10000);
 			easein.setOnFinish(() -> comment.setAnimation(fadeout));
 			fadeout.setOnFinish(() -> comments.remove(comment));

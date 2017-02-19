@@ -3,6 +3,10 @@ package monolith52.comprompt;
 import java.awt.Cursor;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -30,13 +34,15 @@ public class Application extends JFrame {
 	}
 	
 	public void init() {
+		// 設定ファイルからウィンドウyサイズを読めなかった場合のデフォルトサイズ指定
+		setSize(400, 300);
 		
-		config = new Configure();
+		config = new Configure(this);
 		config.load();
 		
 		setTitle("Comment Prompter");
-		setSize(400, 300);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		addWindowListener(new WindowHandler());
 		setVisible(true);
 		
 		commentView = new CommentView(config.getCommentViewModel());
@@ -48,6 +54,16 @@ public class Application extends JFrame {
 		setJMenuBar(menu);
 
 		setTransferHandler(new DropHandler());
+	}
+	
+	protected class WindowHandler extends WindowAdapter {
+		@Override
+		public void windowClosing(WindowEvent event) {
+			// アプリケーション終了前にウインドウサイズを設定ファイルに保存する
+			config.save();
+			
+			super.windowClosing(event);
+		}
 	}
 	
 	protected class DropHandler extends TransferHandler {
