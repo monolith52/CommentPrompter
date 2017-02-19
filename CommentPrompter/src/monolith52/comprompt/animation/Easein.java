@@ -3,7 +3,6 @@ package monolith52.comprompt.animation;
 public class Easein extends AnimationImpl {
 
 	protected int length;
-	protected float easerate;
 	
 	public Easein(int fps, int time, int length) {
 		super(fps, time);

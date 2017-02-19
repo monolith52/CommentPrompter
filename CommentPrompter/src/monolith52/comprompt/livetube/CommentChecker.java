@@ -94,7 +94,15 @@ public class CommentChecker implements Runnable {
 				
 				List<Comment> comments = parseComments(response);
 				updateCurrentNumber(comments);
+				
+				// 一括追加
 				commentFoundListeners.forEach(listener -> listener.commentFound(comments));
+				
+				// TODO: 逐次追加　あんまりなめらかに見えないので縦方向のスライドは要検討
+//				comments.forEach(comment -> {
+//					try {Thread.sleep(100);} catch (InterruptedException e) {}
+//					commentFoundListeners.forEach(listener -> listener.commentFound(Arrays.asList(new Comment[]{comment})));
+//				});
 				
 				try {Thread.sleep(3000);} catch (InterruptedException e) {}
 			} catch (IOException e) {
