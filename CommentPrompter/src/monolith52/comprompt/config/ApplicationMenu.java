@@ -1,7 +1,12 @@
 package monolith52.comprompt.config;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.function.Consumer;
@@ -11,7 +16,10 @@ import javax.swing.JColorChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
+import com.l2fprod.common.swing.BaseDialog;
 import com.l2fprod.common.swing.JFontChooser;
 
 public class ApplicationMenu extends JMenuBar {
@@ -52,7 +60,7 @@ public class ApplicationMenu extends JMenuBar {
 		}
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Font selectedFont = JFontChooser.showDialog(ApplicationMenu.this, "フォントを選択してください", getter.get());
+			Font selectedFont = showLocaledFontChooserDialog(ApplicationMenu.this, "フォントを選択してください", getter.get());
 			if (selectedFont != null) {
 				setter.accept(selectedFont);
 			}
@@ -73,5 +81,32 @@ public class ApplicationMenu extends JMenuBar {
 				setter.accept(selectedColor);
 			}
 		}
+	}
+	
+	protected Font showLocaledFontChooserDialog(Component parent, String title, Font initialFont) {
+		BaseDialog dialog;
+	    Window window = (parent == null?JOptionPane.getRootFrame():SwingUtilities
+	      .windowForComponent(parent));
+	    if (window instanceof Frame) {
+	      dialog = new BaseDialog((Frame)window, title, true);
+	    } else {
+	      dialog = new BaseDialog((Dialog)window, title, true);
+	    }
+	    dialog.setDialogMode(BaseDialog.OK_CANCEL_DIALOG);
+	    dialog.getBanner().setVisible(false);
+
+	    JFontChooser chooser = new JFontChooser(new LocaledFontChooserModel());
+	    chooser.setSelectedFont(initialFont);
+
+	    dialog.getContentPane().setLayout(new BorderLayout());
+	    dialog.getContentPane().add("Center", chooser);
+	    dialog.pack();
+	    dialog.setLocationRelativeTo(parent);
+
+	    if (dialog.ask()) {
+	      return chooser.getSelectedFont();
+	    } else {
+	      return null;
+	    }
 	}
 }

@@ -15,19 +15,25 @@ public class Configure {
 	
 	protected List<ConfigureChangedListener> listeners = new ArrayList<ConfigureChangedListener>();
 	
-	String fontName 	= DEFAULT_FONT.getFontName();
-	String fontSize 	= String.valueOf(DEFAULT_FONT.getSize());
-	String fontStyle 	= String.valueOf(DEFAULT_FONT.getStyle());
+	String fontFamily;
+	String fontSize;
+	String fontStyle;
 	
-	String fontColor 	= ColorUtil.toString(DEFAULT_FONT_COLOR);
-	String bgColor 		= ColorUtil.toString(DEFAULT_BG_COLOR);
+	String fontColor;
+	String bgColor;
+	
+	public Configure() {
+		setFont(DEFAULT_FONT);
+		setFontColor(DEFAULT_FONT_COLOR);
+		setBgColor(DEFAULT_BG_COLOR);
+	}
 	
 	public void addConfigureChangedListener(ConfigureChangedListener listener) {
 		listeners.add(listener);
 	}
 	
 	public void setFont(Font selectedFont) {
-		fontName = selectedFont.getFontName();
+		fontFamily = selectedFont.getFamily();
 		fontSize = String.valueOf(selectedFont.getSize());
 		fontStyle = String.valueOf(selectedFont.getStyle());
 		
@@ -38,7 +44,7 @@ public class Configure {
 		try {
 			int size = Integer.parseInt(fontSize);
 			int style = Integer.parseInt(fontStyle);
-			return new Font(fontName, style, size);
+			return new Font(fontFamily, style, size);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			return DEFAULT_FONT;
