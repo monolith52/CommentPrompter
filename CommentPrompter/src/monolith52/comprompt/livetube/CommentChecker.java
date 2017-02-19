@@ -19,7 +19,7 @@ public class CommentChecker implements Runnable {
 	public final static String ENCODING = "UTF-8";
 	
 	protected final static String DELIMITER_ENTRY	= "<div style=\"background-color: #eee;\">";
-	protected final static Pattern PATTERN_NUMBER 	= Pattern.compile("\r\n([0-9]+) :  ");
+	protected final static Pattern PATTERN_NUMBER 	= Pattern.compile("\r\n([0-9]+) : ");
 	protected final static Pattern PATTERN_NAME 	= Pattern.compile("<span style=\"font-size:1em;color:green; font-weight:bolder;\">(.+)</span>");
 	protected final static Pattern PATTERN_DATETIME = Pattern.compile("<span style=\"\">([0-9]{1,2}/[0-9]{1,2} [0-9]{1,2}:[0-9]{2}:[0-9]{2})</span><br />");
 	protected final static Pattern PATTERN_TEXT 	= Pattern.compile("<span style=\"font-weight:bold;margin-bottom:0px; padding-bottom:0px;\">(.*)</span><br clear=\"left\" />");

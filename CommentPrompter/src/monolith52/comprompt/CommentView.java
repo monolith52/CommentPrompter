@@ -23,7 +23,9 @@ public class CommentView extends JPanel implements Runnable, CommentFoundListene
 	double rad = 0.0d;
 	int fps = 60;
 	long frameinterval = 1000 * 1000 * 1000 / fps;
-	Font font = Configure.DEFAULT_FONT;	// デフォルトフォント
+	Font font 		= Configure.DEFAULT_FONT;
+	Color fontColor = Configure.DEFAULT_FONT_COLOR;
+	Color bgColor 	= Configure.DEFAULT_BG_COLOR;
 	
 	protected boolean isRunnable = false;
 	protected List<Comment> comments = Collections.synchronizedList(new ArrayList<Comment>());
@@ -34,15 +36,14 @@ public class CommentView extends JPanel implements Runnable, CommentFoundListene
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
                 RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		g.setColor(Color.white);
+		g.setColor(bgColor);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
 		g.setFont(font);
-		g.setColor(Color.black);
 		for (int i=Math.max(0, comments.size() - 10); i<comments.size(); i++) {
 			Comment comment = comments.get(i);
 			Animation ani = comment.getAnimation();
-			Color color = new Color(0, 0, 0, ani.getAlpha());
+			Color color = new Color(fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), ani.getAlpha());
 			
 			g.setColor(color);
 			int x = 10 + ani.getX();
@@ -81,6 +82,10 @@ public class CommentView extends JPanel implements Runnable, CommentFoundListene
 		switch (type) {
 		case FONT: 
 			font = config.getFont();
+			break;
+		case COLOR:
+			fontColor = config.getFontColor();
+			bgColor = config.getBgColor();
 			break;
 		}
 	}
