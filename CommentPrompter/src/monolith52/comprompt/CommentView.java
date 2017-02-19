@@ -13,24 +13,36 @@ import javax.swing.JPanel;
 
 import monolith52.comprompt.animation.Animation;
 import monolith52.comprompt.animation.Easein;
-import monolith52.comprompt.config.Configure;
-import monolith52.comprompt.config.Configure.Type;
-import monolith52.comprompt.config.ConfigureChangedListener;
 import monolith52.comprompt.livetube.CommentFoundListener;
 
-public class CommentView extends JPanel implements Runnable, CommentFoundListener, ConfigureChangedListener {
+public class CommentView extends JPanel 
+		implements Runnable, CommentFoundListener, ModelChangedListener<CommentViewModel> {
 	private static final long serialVersionUID = 1L;
 	double rad = 0.0d;
 	int fps = 60;
 	long frameinterval = 1000 * 1000 * 1000 / fps;
 	int padding		= 5;
-	Font font 		= Configure.DEFAULT_FONT;
-	Color fontColor = Configure.DEFAULT_FONT_COLOR;
-	Color bgColor 	= Configure.DEFAULT_BG_COLOR;
 	
+	CommentViewModel model;
+	Font font;
+	Color fontColor;;
+	Color bgColor;;
+
 	protected boolean isRunnable = false;
 	protected List<Comment> comments = Collections.synchronizedList(new ArrayList<Comment>());
 	
+	public CommentView(CommentViewModel model) {
+		this.model = model;
+		model.addChangeListener(this);
+		updateChanges();
+	}
+	
+	public void updateChanges() {
+		font 		= model.getFont();
+		fontColor 	= model.getFontColor();
+		bgColor 	= model.getBgColor();
+	}
+
 	@Override
 	protected void paintComponent(Graphics g1) {
 		Graphics2D g = (Graphics2D)g1;
@@ -83,22 +95,15 @@ public class CommentView extends JPanel implements Runnable, CommentFoundListene
 		newComments.forEach(comment -> comment.setAnimation(new Easein(fps, 1000, 300)));
 		comments.addAll(newComments);
 	}
-
-	@Override
-	public void configureChaqnged(Configure config, Type type) {
-		switch (type) {
-		case FONT: 
-			font = config.getFont();
-			break;
-		case COLOR:
-			fontColor = config.getFontColor();
-			bgColor = config.getBgColor();
-			break;
-		}
-	}
 	
 	public void reset() {
 		comments.clear();
+	}
+
+	@Override
+	public void modelChanged(CommentViewModel model) {
+		this.model = model;
+		updateChanges();
 	}
 
 }

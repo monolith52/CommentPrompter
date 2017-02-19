@@ -1,73 +1,61 @@
 package monolith52.comprompt.config;
 
-import java.awt.Color;
 import java.awt.Font;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
+import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+
+import monolith52.comprompt.CommentViewModel;
 import monolith52.comprompt.util.ColorUtil;
 
 public class Configure {
-	public static final Font DEFAULT_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 20);
-	public static final Color DEFAULT_FONT_COLOR = Color.black;
-	public static final Color DEFAULT_BG_COLOR = Color.white;
-	public enum Type{FONT, COLOR};
 	
-	protected List<ConfigureChangedListener> listeners = new ArrayList<ConfigureChangedListener>();
+	protected final File CONFIG_FILE = new File("config.xml");
 	
-	String fontFamily;
-	String fontSize;
-	String fontStyle;
+	CommentViewModel commentViewModel = new CommentViewModel();
 	
-	String fontColor;
-	String bgColor;
-	
-	public Configure() {
-		setFont(DEFAULT_FONT);
-		setFontColor(DEFAULT_FONT_COLOR);
-		setBgColor(DEFAULT_BG_COLOR);
+	public CommentViewModel getCommentViewModel() {
+		return commentViewModel;
 	}
-	
-	public void addConfigureChangedListener(ConfigureChangedListener listener) {
-		listeners.add(listener);
-	}
-	
-	public void setFont(Font selectedFont) {
-		fontFamily = selectedFont.getFamily();
-		fontSize = String.valueOf(selectedFont.getSize());
-		fontStyle = String.valueOf(selectedFont.getStyle());
-		
-		listeners.forEach(l -> l.configureChaqnged(this, Type.FONT));
-	}
-	
-	public Font getFont() {
+
+	public void save() {
 		try {
-			int size = Integer.parseInt(fontSize);
-			int style = Integer.parseInt(fontStyle);
-			return new Font(fontFamily, style, size);
-		} catch (NumberFormatException e) {
+			Configurations configs = new Configurations();
+			FileBasedConfigurationBuilder<XMLConfiguration> builder = configs.xmlBuilder(CONFIG_FILE.getAbsolutePath());
+			XMLConfiguration config = builder.getConfiguration();
+			config.setProperty("fontFamily"	, commentViewModel.getFont().getFamily());
+			config.setProperty("fontStyle"	, commentViewModel.getFont().getStyle());
+			config.setProperty("fontSize"	, commentViewModel.getFont().getSize());
+			config.setProperty("fontColor"	, ColorUtil.toString(commentViewModel.getFontColor()));
+			config.setProperty("bgColor"	, ColorUtil.toString(commentViewModel.getBgColor()));
+			builder.save();
+		} catch (org.apache.commons.configuration2.ex.ConfigurationException e) {
 			e.printStackTrace();
-			return DEFAULT_FONT;
 		}
 	}
 	
-	public void setFontColor(Color color) {
-		fontColor = ColorUtil.toString(color);
+	public void load() {
+		XMLConfiguration config = null;
+		try {
+			Configurations configs = new Configurations();
+			config = configs.xml(CONFIG_FILE.getAbsolutePath());
+		} catch (org.apache.commons.configuration2.ex.ConfigurationException e) {
+			e.printStackTrace();
+		}
+		if (config == null) return;
 		
-		listeners.forEach(l -> l.configureChaqnged(this, Type.COLOR));
-	}
-	
-	public Color getFontColor() {
-		return ColorUtil.parseColor(fontColor, DEFAULT_FONT_COLOR);
-	}
-	
-	public void setBgColor(Color color) {
-		bgColor = ColorUtil.toString(color);
-		
-		listeners.forEach(l -> l.configureChaqnged(this, Type.COLOR));
-	}
-	
-	public Color getBgColor() {
-		return ColorUtil.parseColor(bgColor, DEFAULT_FONT_COLOR);
+		final CommentViewModel cvm = commentViewModel;
+		cvm.setFont(new Font(
+				config.getString("fontFamily", cvm.getFont().getFamily()),
+				config.getInt("fontStyle", cvm.getFont().getStyle()),
+				config.getInt("fontSize", cvm.getFont().getSize())));
+		cvm.setFontColor(
+				ColorUtil.parseColor(config.getString("fontColor",
+						ColorUtil.toString(cvm.getFontColor())), cvm.getFontColor()));
+		cvm.setBgColor(
+				ColorUtil.parseColor(config.getString("bgColor",
+						ColorUtil.toString(cvm.getBgColor())), cvm.getBgColor()));
 	}
 }

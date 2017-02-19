@@ -22,6 +22,8 @@ import javax.swing.SwingUtilities;
 import com.l2fprod.common.swing.BaseDialog;
 import com.l2fprod.common.swing.JFontChooser;
 
+import monolith52.comprompt.CommentViewModel;
+
 public class ApplicationMenu extends JMenuBar {
 	private static final long serialVersionUID = 1L;
 	Configure config;
@@ -32,6 +34,7 @@ public class ApplicationMenu extends JMenuBar {
 	}
 	
 	public void init() {
+		CommentViewModel commentViewModel = config.getCommentViewModel();
 		JMenu menu;
 		JMenuItem item;
 		
@@ -39,15 +42,15 @@ public class ApplicationMenu extends JMenuBar {
 		add(menu);
 		
 		item = new JMenuItem("フォント");
-		item.addActionListener(new FontItemAction(config::setFont, config::getFont));
+		item.addActionListener(new FontItemAction(commentViewModel::setFont, commentViewModel::getFont));
 		menu.add(item);
 		
 		item = new JMenuItem("文字色");
-		item.addActionListener(new ColorItemAction(config::setFontColor, config::getFontColor));
+		item.addActionListener(new ColorItemAction(commentViewModel::setFontColor, commentViewModel::getFontColor));
 		menu.add(item);
 		
 		item = new JMenuItem("背景色");
-		item.addActionListener(new ColorItemAction(config::setBgColor, config::getBgColor));
+		item.addActionListener(new ColorItemAction(commentViewModel::setBgColor, commentViewModel::getBgColor));
 		menu.add(item);
 	}
 	
@@ -63,6 +66,7 @@ public class ApplicationMenu extends JMenuBar {
 			Font selectedFont = showLocaledFontChooserDialog(ApplicationMenu.this, "フォントを選択してください", getter.get());
 			if (selectedFont != null) {
 				setter.accept(selectedFont);
+				config.save();
 			}
 		}
 	}
@@ -79,6 +83,7 @@ public class ApplicationMenu extends JMenuBar {
 			Color selectedColor = JColorChooser.showDialog(ApplicationMenu.this, "", getter.get());
 			if (selectedColor != null) {
 				setter.accept(selectedColor);
+				config.save();
 			}
 		}
 	}

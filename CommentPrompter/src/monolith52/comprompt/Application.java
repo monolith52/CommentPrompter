@@ -31,17 +31,17 @@ public class Application extends JFrame {
 	
 	public void init() {
 		
+		config = new Configure();
+		config.load();
+		
 		setTitle("Comment Prompter");
 		setSize(400, 300);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		
-		commentView = new CommentView();
+		commentView = new CommentView(config.getCommentViewModel());
 		add(commentView);
 		new Thread(commentView).start();
-		
-		config = new Configure();
-		config.addConfigureChangedListener(commentView);
 
 		menu = new ApplicationMenu(config);
 		menu.init();
