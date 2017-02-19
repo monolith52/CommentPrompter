@@ -3,8 +3,6 @@ package monolith52.comprompt;
 import java.awt.Cursor;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -31,11 +29,12 @@ public class Application extends JFrame {
 	Object targetUrlLock = new Object();
 	
 	public Application() {
+		// 設定ファイルからウィンドウyサイズを読めなかった場合のデフォルトサイズ指定
+		// ウインドウサイズは設定ファイルが読まれると自動的にに変更される
+		setSize(ApplicationModel.DEFAULT_SIZE);
 	}
 	
 	public void init() {
-		// 設定ファイルからウィンドウyサイズを読めなかった場合のデフォルトサイズ指定
-		setSize(400, 300);
 		
 		config = new Configure(this);
 		config.load();

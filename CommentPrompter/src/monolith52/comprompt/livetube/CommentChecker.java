@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import monolith52.comprompt.Comment;
 import monolith52.comprompt.util.MatchUtil;
 import monolith52.comprompt.util.SafeConnection;
+import monolith52.comprompt.util.StripTagsTransformer;
 
 public class CommentChecker implements Runnable {
 
@@ -74,6 +75,10 @@ public class CommentChecker implements Runnable {
 		return comments;
 	}
 	
+	private void transformComment(Comment comment) {
+		comment.setText(StripTagsTransformer.decode(StripTagsTransformer.stripTags(comment.getText())));
+	}
+	
 	protected void updateCurrentNumber(List<Comment> comments) {
 		if (comments == null || comments.size() == 0) return;
 		
@@ -94,6 +99,8 @@ public class CommentChecker implements Runnable {
 				
 				List<Comment> comments = parseComments(response);
 				updateCurrentNumber(comments);
+				
+				comments.forEach(this::transformComment);
 				
 				// 一括追加
 				commentFoundListeners.forEach(listener -> listener.commentFound(comments));

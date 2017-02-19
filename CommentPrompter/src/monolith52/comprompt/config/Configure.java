@@ -3,14 +3,9 @@ package monolith52.comprompt.config;
 import java.awt.Font;
 import java.io.File;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 
 import monolith52.comprompt.Application;
 import monolith52.comprompt.ApplicationModel;
