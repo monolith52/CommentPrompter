@@ -22,7 +22,7 @@ import javax.swing.SwingUtilities;
 import com.l2fprod.common.swing.BaseDialog;
 import com.l2fprod.common.swing.JFontChooser;
 
-import monolith52.comprompt.CommentViewModel;
+import monolith52.comprompt.view.CommentViewModel;
 
 public class ApplicationMenu extends JMenuBar {
 	private static final long serialVersionUID = 1L;

@@ -9,8 +9,8 @@ import org.apache.commons.configuration2.builder.fluent.Configurations;
 
 import monolith52.comprompt.Application;
 import monolith52.comprompt.ApplicationModel;
-import monolith52.comprompt.CommentViewModel;
 import monolith52.comprompt.util.ColorUtil;
+import monolith52.comprompt.view.CommentViewModel;
 
 public class Configure {
 	
@@ -58,7 +58,6 @@ public class Configure {
 		try {
 			Configurations configs = new Configurations();
 			config = configs.xml(CONFIG_FILE);
-			
 		} catch (org.apache.commons.configuration2.ex.ConfigurationException e) {
 			e.printStackTrace();
 		}
@@ -69,11 +68,13 @@ public class Configure {
 				config.getInt("fontStyle", cvm.getFont().getStyle()),
 				config.getInt("fontSize", cvm.getFont().getSize())));
 		cvm.setFontColor(
-				ColorUtil.parseColor(config.getString("fontColor",
-						ColorUtil.toString(cvm.getFontColor())), cvm.getFontColor()));
+				ColorUtil.parseColor(
+						config.getString("fontColor", ColorUtil.toString(cvm.getFontColor())), 
+						cvm.getFontColor()));
 		cvm.setBgColor(
-				ColorUtil.parseColor(config.getString("bgColor",
-						ColorUtil.toString(cvm.getBgColor())), cvm.getBgColor()));
+				ColorUtil.parseColor(
+						config.getString("bgColor", ColorUtil.toString(cvm.getBgColor())), 
+						cvm.getBgColor()));
 		
 		apm.setWindowWidth(config.getInt("windowWidth", apm.getWindowWidth()));
 		apm.setWindowHeight(config.getInt("windowHeight", apm.getWindowHeight()));

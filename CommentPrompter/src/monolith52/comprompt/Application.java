@@ -16,6 +16,7 @@ import monolith52.comprompt.config.ApplicationMenu;
 import monolith52.comprompt.config.Configure;
 import monolith52.comprompt.livetube.CommentChecker;
 import monolith52.comprompt.livetube.IdDetector;
+import monolith52.comprompt.view.CommentView;
 
 public class Application extends JFrame {
 	private static final long serialVersionUID = 1L;

@@ -1,9 +1,11 @@
-package monolith52.comprompt;
+package monolith52.comprompt.view;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
+
+import monolith52.comprompt.ModelChangedListener;
 
 public class CommentViewModel {
 	List<ModelChangedListener<CommentViewModel> > listeners = new ArrayList<ModelChangedListener<CommentViewModel> >();
