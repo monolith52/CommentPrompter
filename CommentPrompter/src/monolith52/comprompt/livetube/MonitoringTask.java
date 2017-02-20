@@ -7,6 +7,9 @@ import java.util.List;
 public class MonitoringTask implements Runnable {
 	boolean running = false;
 	String url;
+	CommentMonitor commentMonitor;
+	Object commentMonitorLock = new Object();
+	
 	List<CommentFoundListener> commentFoundListeners = new ArrayList<CommentFoundListener>();
 	List<MonitoringListener> monitoringListeners = new ArrayList<MonitoringListener>();
 	
@@ -27,9 +30,6 @@ public class MonitoringTask implements Runnable {
 		running = true;
 		
 		try {
-			// 画面表示をクリア
-//			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			
 			// IDを取得
 			StreamingDetector detector = new StreamingDetector(url);
 			Streaming streaming = detector.detect();
@@ -38,10 +38,14 @@ public class MonitoringTask implements Runnable {
 			monitoringListeners.forEach(l -> l.streamingDetected(streaming));
 			
 			// コメントの取得
-			// すでにGUIスレッドではないのでコメントの取得は別スレッドでstartする必要がない
-			CommentMonitor commentMonitor = new CommentMonitor(streaming.getId());
+			synchronized (commentMonitorLock) {
+				commentMonitor = new CommentMonitor(streaming.getId());
+				if (!running) return;
+			}
 			commentFoundListeners.forEach(commentMonitor::addCommentFoundListener);
 			monitoringListeners.forEach(commentMonitor::addMonitoringListeners);
+
+			// すでにGUIスレッドではないのでコメントの取得は別スレッドでstartする必要がない
 			commentMonitor.run();
 			
 		} catch (IOException e) {
@@ -51,6 +55,11 @@ public class MonitoringTask implements Runnable {
 	}
 
 	public void stop() {
-		running = false;
+		synchronized (commentMonitorLock) {
+			if (commentMonitor != null) {
+				commentMonitor.stop();
+			}
+			running = false;
+		}
 	}
 }
