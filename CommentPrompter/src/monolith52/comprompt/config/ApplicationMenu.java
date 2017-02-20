@@ -9,6 +9,8 @@ import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -22,16 +24,20 @@ import javax.swing.SwingUtilities;
 import com.l2fprod.common.swing.BaseDialog;
 import com.l2fprod.common.swing.JFontChooser;
 
+import monolith52.comprompt.ModelChangedListener;
 import monolith52.comprompt.view.CommentViewModel;
+import monolith52.comprompt.view.ViewStyle;
 import monolith52.comprompt.view.ViewStyleFactory;
 
 public class ApplicationMenu extends JMenuBar {
 	private static final long serialVersionUID = 1L;
 	Configure config;
+	List<JMenuItem> viewStyleMenuItems = new ArrayList<JMenuItem>();
 	
 	public ApplicationMenu(Configure config) {
 		super();
 		this.config = config;
+		config.getCommentViewModel().addChangeListener(new ModelChangedHandler());
 	}
 	
 	public void init() {
@@ -62,8 +68,11 @@ public class ApplicationMenu extends JMenuBar {
 				config.save();
 			});
 			viewMenu.add(sub);
+			viewStyleMenuItems.add(sub);
 		});
 		menu.add(viewMenu);
+
+		updateViewStyleToggle(config.getCommentViewModel().getViewStyle());
 	}
 	
 	protected class FontItemAction implements ActionListener {
@@ -125,5 +134,17 @@ public class ApplicationMenu extends JMenuBar {
 	    } else {
 	      return null;
 	    }
+	}
+	
+	public void updateViewStyleToggle(ViewStyle viewStyle) {
+		viewStyleMenuItems.forEach(item -> {
+			item.setEnabled(!viewStyle.getId().equals(item.getText()));
+		});
+	}
+	
+	class ModelChangedHandler implements ModelChangedListener<CommentViewModel> {
+		public void modelChanged(CommentViewModel model) {
+			SwingUtilities.invokeLater(() -> updateViewStyleToggle(model.getViewStyle()));
+		}
 	}
 }
