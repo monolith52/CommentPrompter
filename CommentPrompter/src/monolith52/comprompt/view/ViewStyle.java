@@ -1,6 +1,5 @@
 package monolith52.comprompt.view;
 
-import monolith52.comprompt.Comment;
 import monolith52.comprompt.animation.Animation;
 
 public interface ViewStyle {

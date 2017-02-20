@@ -1,6 +1,5 @@
 package monolith52.comprompt.view;
 
-import monolith52.comprompt.Comment;
 import monolith52.comprompt.animation.Animation;
 import monolith52.comprompt.animation.Easein;
 import monolith52.comprompt.animation.Fadeout;

@@ -1,7 +1,6 @@
 package monolith52.comprompt.livetube;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import monolith52.comprompt.util.MatchUtil;

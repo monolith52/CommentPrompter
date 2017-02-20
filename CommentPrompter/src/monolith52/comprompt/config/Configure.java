@@ -2,10 +2,16 @@ package monolith52.comprompt.config;
 
 import java.awt.Font;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.io.IOUtils;
 
 import monolith52.comprompt.Application;
 import monolith52.comprompt.ApplicationModel;
@@ -14,7 +20,7 @@ import monolith52.comprompt.view.CommentViewModel;
 import monolith52.comprompt.view.ViewStyleFactory;
 
 public class Configure {
-	
+	protected final String INITIAL_CONFIG_FILE = "/config.xml";
 	protected final File CONFIG_FILE = new File("config.xml");
 	
 	ApplicationModel apm;
@@ -56,6 +62,8 @@ public class Configure {
 	}
 	
 	public void load() {
+		if (!CONFIG_FILE.exists()) copyInitialFile();
+		
 		XMLConfiguration config = null;
 		try {
 			Configurations configs = new Configurations();
@@ -84,5 +92,19 @@ public class Configure {
 		
 		apm.setWindowWidth(config.getInt("windowWidth", apm.getWindowWidth()));
 		apm.setWindowHeight(config.getInt("windowHeight", apm.getWindowHeight()));
+	}
+	
+	protected void copyInitialFile() {
+		try (InputStream in = getClass().getResourceAsStream(INITIAL_CONFIG_FILE)) {
+			try (OutputStream out = new FileOutputStream(CONFIG_FILE)) {
+				IOUtils.copy(in, out);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 }
