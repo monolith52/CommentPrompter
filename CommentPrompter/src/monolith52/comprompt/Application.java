@@ -14,20 +14,24 @@ import javax.swing.TransferHandler;
 
 import monolith52.comprompt.config.ApplicationMenu;
 import monolith52.comprompt.config.Configure;
-import monolith52.comprompt.livetube.CommentChecker;
-import monolith52.comprompt.livetube.IdDetector;
+import monolith52.comprompt.livetube.CommentMonitor;
+import monolith52.comprompt.livetube.MonitoringListener;
+import monolith52.comprompt.livetube.MonitoringTask;
+import monolith52.comprompt.livetube.Streaming;
 import monolith52.comprompt.view.CommentView;
 
 public class Application extends JFrame {
 	private static final long serialVersionUID = 1L;
-	protected static DataFlavor IMPORTABLE_FLAVOR = new DataFlavor(String.class, "text/plain");
+	protected final static DataFlavor IMPORTABLE_FLAVOR = new DataFlavor(String.class, "text/plain");
+	protected final static String TITLE = "Comment Prompter";
+	protected final static String TITLE_SUCCESS = " > ";
+	protected final static String TITLE_FAILED = " [停止中] ";
 	
 	Configure config;
 	ApplicationMenu menu;
 	CommentView commentView;
-	CommentChecker commentChecker;
-	String targetUrl;
-	Object targetUrlLock = new Object();
+	MonitoringTask monitoringTask;
+	Object monitoringTaskLock = new Object();
 	
 	public Application() {
 		// 設定ファイルからウィンドウyサイズを読めなかった場合のデフォルトサイズ指定
@@ -40,7 +44,7 @@ public class Application extends JFrame {
 		config = new Configure(this);
 		config.load();
 		
-		setTitle("Comment Prompter");
+		setTitle(TITLE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addWindowListener(new WindowHandler());
 		setVisible(true);
@@ -93,60 +97,68 @@ public class Application extends JFrame {
 			
 			System.out.println("Accept import data: " + data);
 			final String url = (String)data;
-			new Thread(new Runnable(){
-				@Override
-				public void run() {
-					startTask(url);
-				}
-			}).start();
+			startTask(url);
 			return true;
 		}
 	}
 	
+	/**
+	 * コメント監視の成否に基づいて呼ばれるハンドラ
+	 */
+	class MonitoringHandler implements MonitoringListener {
+		@Override
+		public void streamingDetected(Streaming streaming) {
+			SwingUtilities.invokeLater(() -> {
+				setTitle(formatTitle(streaming.getTitle(), false));
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			});
+		}
+		@Override
+		public void detectionFailed(String msg) {
+			SwingUtilities.invokeLater(() -> {
+				setTitle(formatTitle(msg, true));
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			});
+		}
+		@Override
+		public void monitoringFailed(String msg) {
+			SwingUtilities.invokeLater(() -> {
+				setTitle(formatTitle(msg, true));
+			});
+		}
+	}
+	
+	protected String formatTitle(String msg, boolean isFailed) {
+		StringBuffer buffer = new StringBuffer(TITLE);
+		
+		if (isFailed) return buffer.append(TITLE_FAILED).append(msg).toString();
+		
+		if (msg != null) {
+			return buffer.append(TITLE_SUCCESS).append(msg).toString();
+		}
+		
+		return buffer.toString();
+	}
+	
 	public void startTask(String url) {
-		
-		// TODO: 同じURLでの連投をはじいているがユーザに分かりにくい　他の方法をに変更するべき
-		synchronized (targetUrlLock) {
-			if (url.equals(targetUrl)) return;
-			targetUrl = url;
-			if (commentChecker != null) {
-				commentChecker.stop();
-				commentChecker = null;
+		synchronized (monitoringTaskLock) {
+			if (monitoringTask != null) {
+				monitoringTask.stop();
+				monitoringTask = null;
 			}
-		}
-		
-		try {
-			// 画面表示をクリア
-			commentView.reset();
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			
-			// IDを取得
-			IdDetector detector = new IdDetector(url);
-			String id = detector.detect();
-			setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			
-			// コメントの取得
-			// すでにGUIスレッドではないのでコメントの取得は別スレッドでstartする必要がない
-			synchronized (targetUrlLock) {
-				if (!url.equals(targetUrl)) return;
-				commentChecker = new CommentChecker(id);
-			}
-			commentChecker.addCommentFoundListener(commentView);
-			commentChecker.run();
-			
-		} catch (IOException e) {
-			assert false: "id detection failed.";
+			commentView.reset();
+			monitoringTask = new MonitoringTask(url);
+			monitoringTask.addCommentFoundListener(commentView);
+			monitoringTask.addMonitoringListener(new MonitoringHandler());
 		}
-
+		new Thread(monitoringTask).start();
 	}
 	
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable(){
-			@Override
-			public void run() {
-				Application app = new Application();
-				app.init();
-			}
+		SwingUtilities.invokeLater(() -> {
+			Application app = new Application();
+			app.init();
 		});
 	}
 

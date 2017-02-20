@@ -71,21 +71,35 @@ public class CommentView extends JPanel
 			for (int i=comments.size()-1; i>=0; i--) {
 				Comment comment = comments.get(i);
 				Animation ani = comment.getAnimation();
+				
+				
 				Color color = new Color(fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), ani.getAlpha());
-				
 				g.setColor(color);
-				int x = viewStyle.getX(comment, i, comments.size());
-				int y = viewStyle.getY(comment, i, comments.size());
-				
 				synchronized (slideAnimations) {
 					slideAnimations.forEach(slide -> g.translate(slide.getX(), slide.getY()));
 					g.translate(ani.getX(), ani.getY());
+					
+					int x = viewStyle.getX(comment, i, comments.size());
+					int y = viewStyle.getY(comment, i, comments.size());
 					g.drawString(comment.getText(), x, y);
+					
 					g.translate(-ani.getX(), -ani.getY());
 					slideAnimations.forEach(slide -> g.translate(-slide.getX(), -slide.getY()));
 				}
 			}
 		}
+	}
+	
+	protected void process() {
+		synchronized (comments) {
+			comments.forEach(comment -> comment.getAnimation().step());
+			comments.removeIf(comment -> comment.isGarbage());
+		}
+		synchronized (slideAnimations) {
+			slideAnimations.forEach(slide -> slide.step());
+			slideAnimations.removeIf(slide -> slide.isFinished());
+		}
+
 	}
 
 	@Override
@@ -96,14 +110,7 @@ public class CommentView extends JPanel
 			frameinterval = 1000 * 1000 * 1000 / fps;
 			//　描画速度コントロール
 			lasttime = System.nanoTime();
-			synchronized (comments) {
-				comments.forEach(comment -> comment.getAnimation().step());
-				comments.removeIf(comment -> comment.isGarbage());
-			}
-			synchronized (slideAnimations) {
-				slideAnimations.forEach(slide -> slide.step());
-				slideAnimations.removeIf(slide -> slide.isFinished());
-			}
+			process();
 			repaint();
 			
 			currenttime = System.nanoTime();
@@ -115,7 +122,6 @@ public class CommentView extends JPanel
 
 	@Override
 	public void commentFound(List<Comment> newComments) {
-		int unitDistance = (font.getSize() + 10);
 		newComments.forEach(comment -> {
 			System.out.println("New comment found: " + comment.getText());
 			comment.setAnimation(viewStyle.getCommentAnimation(comment));
@@ -133,6 +139,9 @@ public class CommentView extends JPanel
 	public void reset() {
 		synchronized (comments) {
 			comments.clear();
+		}
+		synchronized (slideAnimations) {
+			slideAnimations.clear();
 		}
 	}
 

@@ -15,7 +15,7 @@ import monolith52.comprompt.util.SafeConnection;
 import monolith52.comprompt.util.StripTagsTransformer;
 import monolith52.comprompt.util.ThreadUtil;
 
-public class CommentChecker implements Runnable {
+public class CommentMonitor implements Runnable {
 
 	public final static String HOST = "livetube.cc";
 	public final static String ENCODING = "UTF-8";
@@ -31,17 +31,18 @@ public class CommentChecker implements Runnable {
 	protected int currentNumber = 0;
 
 	protected List<CommentFoundListener> commentFoundListeners = new ArrayList<CommentFoundListener>();
+	protected List<MonitoringListener> monitoringListeners = new ArrayList<MonitoringListener>();
 	
-	public CommentChecker(String id) {
+	public CommentMonitor(String id) {
 		this.id = id;
 	}
 	
 	public void addCommentFoundListener(CommentFoundListener listener) {
 		commentFoundListeners.add(listener);
 	}
-	
-	public void removeCommentFoundListener(CommentFoundListener listener) {
-		commentFoundListeners.remove(listener);
+
+	public void addMonitoringListeners(MonitoringListener listener) {
+		monitoringListeners.add(listener);
 	}
 	
 	private String getTargetUrl(String id) {
@@ -114,25 +115,18 @@ public class CommentChecker implements Runnable {
 				// 一括通知
 				commentFoundListeners.forEach(listener -> listener.commentFound(comments));
 				
-				// 逐次通知
-//				comments.forEach(comment -> {
-//					ThreadUtil.sleep(100);
-//					commentFoundListeners.forEach(listener -> listener.commentFound(Arrays.asList(new Comment[]{comment})));
-//				});
-				
 				ThreadUtil.sleep(3000);
 			} catch (IOException e) {
-				ThreadUtil.sleep(500);
-				e.printStackTrace();
+				monitoringListeners.forEach(l -> l.monitoringFailed(e.getMessage()));
 				stop();
 			}
 		}
 		
-		System.out.println("Stopped checker for: " + id);
+		System.out.println("Stopped monitor for: " + id);
 	}
 	
 	public void stop() {
-		System.out.println("Stopping checker for: " + id);
+		System.out.println("Stopping monitor for: " + id);
 		isRunning = false;
 	}
 }
