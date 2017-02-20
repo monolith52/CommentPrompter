@@ -2,9 +2,11 @@ package monolith52.comprompt.view;
 
 import java.awt.Image;
 
+import monolith52.comprompt.Comment;
 import monolith52.comprompt.animation.Animation;
 
 public class Entry {
+	Comment comment;
 	Image image;
 	Animation animation;
 	boolean garbage = false;
@@ -26,5 +28,11 @@ public class Entry {
 	}
 	public void setGarbage(boolean garbage) {
 		this.garbage = garbage;
+	}
+	public Comment getComment() {
+		return comment;
+	}
+	public void setComment(Comment comment) {
+		this.comment = comment;
 	}
 }

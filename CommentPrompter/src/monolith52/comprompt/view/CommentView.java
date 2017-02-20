@@ -6,14 +6,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import monolith52.comprompt.Comment;
@@ -51,6 +46,7 @@ public class CommentView extends JPanel
 		bgColor 	= model.getBgColor();
 		model.getViewStyle().setCommentView(this); 
 		viewStyle	= model.getViewStyle();
+		rerenderAllEntries();
 	}
 	
 	public Font getFont() {
@@ -125,12 +121,21 @@ public class CommentView extends JPanel
 			lasttime = currenttime;
 		}
 	}
+	
+	protected void rerenderAllEntries() {
+		synchronized (entries) {
+			entries.forEach(entry -> {
+				entry.setImage(EntryRenderer.render(entry.getComment().getText(), font, fontColor, padding));
+			});
+		}
+	}
 
 	@Override
 	public void commentFound(List<Comment> newComments) {
 		newComments.forEach(comment -> {
 			System.out.println("New comment found: " + comment.getText());
 			Entry entry = new Entry();
+			entry.setComment(comment);
 			entry.setImage(EntryRenderer.render(comment.getText(), font, fontColor, padding));
 			entry.setAnimation(viewStyle.getEntryAnimation(entry));
 			synchronized (entries) {

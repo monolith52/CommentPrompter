@@ -1,23 +1,11 @@
 package monolith52.comprompt;
 
-import monolith52.comprompt.animation.Animation;
-
 public class Comment {
 	int number;
 	String icon;
 	String name;
 	String datetime;
 	String text;
-	boolean garbage = false;
-	Animation animation;
-	
-	public void setAnimation(Animation animation) {
-		this.animation = animation;
-	}
-	
-	public Animation getAnimation() {
-		return animation;
-	}
 	
 	public String getDatetime() {
 		return datetime;
@@ -48,12 +36,6 @@ public class Comment {
 	}
 	public void setText(String text) {
 		this.text = text;
-	}
-	public boolean isGarbage() {
-		return garbage;
-	}
-	public void setGarbage(boolean garbage) {
-		this.garbage = garbage;
 	}
 
 }

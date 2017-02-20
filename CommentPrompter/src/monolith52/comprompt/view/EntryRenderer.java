@@ -3,13 +3,17 @@ package monolith52.comprompt.view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 public class EntryRenderer {
+	
+	public static int getDisplayWidth() {
+		return (int)GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getWidth();
+	}
 	
 	public static BufferedImage render(String str, Font font, Color color, int padding) {
 		BufferedImage dummy = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
@@ -18,7 +22,9 @@ public class EntryRenderer {
 		FontRenderContext frc = dg.getFontMetrics(font).getFontRenderContext();
 		
 		Rectangle2D rect = font.getStringBounds(str, frc);
-		BufferedImage image = createTransparentImage((int)rect.getWidth() + padding * 2, (int)rect.getHeight() + padding * 2);
+		BufferedImage image = createTransparentImage(
+				Math.min((int)rect.getWidth() + padding * 2, getDisplayWidth()),
+				(int)rect.getHeight() + padding * 2);
 		Graphics2D g2d = image.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setColor(color);

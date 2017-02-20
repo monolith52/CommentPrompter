@@ -14,7 +14,6 @@ import javax.swing.TransferHandler;
 
 import monolith52.comprompt.config.ApplicationMenu;
 import monolith52.comprompt.config.Configure;
-import monolith52.comprompt.livetube.CommentMonitor;
 import monolith52.comprompt.livetube.MonitoringListener;
 import monolith52.comprompt.livetube.MonitoringTask;
 import monolith52.comprompt.livetube.Streaming;
