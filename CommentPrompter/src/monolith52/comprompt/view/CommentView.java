@@ -33,8 +33,8 @@ public class CommentView extends JPanel
 	Color bgColor;
 
 	protected boolean isRunnable = false;
-	protected List<Comment> comments = Collections.synchronizedList(new LinkedList<Comment>());
-	protected List<Animation> slideAnimations = Collections.synchronizedList(new LinkedList<Animation>());
+	protected List<Comment> comments = new LinkedList<Comment>();
+	protected List<Animation> slideAnimations = new LinkedList<Animation>();
 	
 	public CommentView(CommentViewModel model) {
 		this.model = model;
