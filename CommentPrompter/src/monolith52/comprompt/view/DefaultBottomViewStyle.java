@@ -7,7 +7,7 @@ import monolith52.comprompt.animation.Fadeout;
 
 public class DefaultBottomViewStyle extends ViewStyleImpl {
 
-	public final static String ID = "下";
+	public final static String ID = "下から上へ";
 	@Override
 	public String getId() {
 		return ID;
