@@ -11,6 +11,7 @@ import monolith52.comprompt.Application;
 import monolith52.comprompt.ApplicationModel;
 import monolith52.comprompt.util.ColorUtil;
 import monolith52.comprompt.view.CommentViewModel;
+import monolith52.comprompt.view.ViewStyleFactory;
 
 public class Configure {
 	
@@ -38,11 +39,12 @@ public class Configure {
 			FileBasedConfigurationBuilder<XMLConfiguration> builder = configs.xmlBuilder(CONFIG_FILE);
 			XMLConfiguration config = builder.getConfiguration();
 			
-			config.setProperty("fontFamily"	, cvm.getFont().getFamily());
-			config.setProperty("fontStyle"	, cvm.getFont().getStyle());
-			config.setProperty("fontSize"	, cvm.getFont().getSize());
-			config.setProperty("fontColor"	, ColorUtil.toString(cvm.getFontColor()));
-			config.setProperty("bgColor"	, ColorUtil.toString(cvm.getBgColor()));
+			config.setProperty("fontFamily", cvm.getFont().getFamily());
+			config.setProperty("fontStyle", cvm.getFont().getStyle());
+			config.setProperty("fontSize", cvm.getFont().getSize());
+			config.setProperty("fontColor", ColorUtil.toString(cvm.getFontColor()));
+			config.setProperty("bgColor", ColorUtil.toString(cvm.getBgColor()));
+			config.setProperty("viewStyle", cvm.getViewStyle().getId());
 			
 			config.setProperty("windowWidth", apm.getWindowWidth());
 			config.setProperty("windowHeight", apm.getWindowHeight());
@@ -75,6 +77,10 @@ public class Configure {
 				ColorUtil.parseColor(
 						config.getString("bgColor", ColorUtil.toString(cvm.getBgColor())), 
 						cvm.getBgColor()));
+		cvm.setViewStyle(
+				ViewStyleFactory.getInstanceFor(
+						config.getString("viewStyle", cvm.getViewStyle().getId()),
+						cvm.getViewStyle()));
 		
 		apm.setWindowWidth(config.getInt("windowWidth", apm.getWindowWidth()));
 		apm.setWindowHeight(config.getInt("windowHeight", apm.getWindowHeight()));

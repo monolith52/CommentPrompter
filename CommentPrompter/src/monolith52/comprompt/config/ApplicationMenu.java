@@ -23,6 +23,7 @@ import com.l2fprod.common.swing.BaseDialog;
 import com.l2fprod.common.swing.JFontChooser;
 
 import monolith52.comprompt.view.CommentViewModel;
+import monolith52.comprompt.view.ViewStyleFactory;
 
 public class ApplicationMenu extends JMenuBar {
 	private static final long serialVersionUID = 1L;
@@ -52,6 +53,17 @@ public class ApplicationMenu extends JMenuBar {
 		item = new JMenuItem("背景色");
 		item.addActionListener(new ColorItemAction(commentViewModel::setBgColor, commentViewModel::getBgColor));
 		menu.add(item);
+		
+		JMenu viewMenu = new JMenu("描画方法");
+		ViewStyleFactory.getDirectory().forEach((key, value) -> {
+			JMenuItem sub = new JMenuItem(key);
+			sub.addActionListener((e) -> {
+				commentViewModel.setViewStyle(ViewStyleFactory.getInstanceFor(key));
+				config.save();
+			});
+			viewMenu.add(sub);
+		});
+		menu.add(viewMenu);
 	}
 	
 	protected class FontItemAction implements ActionListener {

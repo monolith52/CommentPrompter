@@ -7,8 +7,10 @@ import monolith52.comprompt.animation.Fadeout;
 
 public class DefaultBottomViewStyle extends ViewStyleImpl {
 
-	public DefaultBottomViewStyle(CommentView view) {
-		super(view);
+	public final static String ID = "下";
+	@Override
+	public String getId() {
+		return ID;
 	}
 	
 	@Override

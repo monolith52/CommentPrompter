@@ -40,13 +40,14 @@ public class CommentView extends JPanel
 		this.model = model;
 		model.addChangeListener(this);
 		updateChanges();
-		viewStyle = new DefaultBottomViewStyle(this);
 	}
 	
 	public void updateChanges() {
 		font 		= model.getFont();
 		fontColor 	= model.getFontColor();
 		bgColor 	= model.getBgColor();
+		model.getViewStyle().setCommentView(this); 
+		viewStyle	= model.getViewStyle();
 	}
 	
 	public Font getFont() {
