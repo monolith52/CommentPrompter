@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.unbescape.html.HtmlEscape;
+
 import monolith52.comprompt.Comment;
 import monolith52.comprompt.util.MatchUtil;
 import monolith52.comprompt.util.SafeConnection;
@@ -78,7 +80,7 @@ public class CommentMonitor implements Runnable {
 	}
 	
 	private void transformComment(Comment comment) {
-		comment.setText(StripTagsTransformer.decode(StripTagsTransformer.stripTags(comment.getText())));
+		comment.setText(HtmlEscape.unescapeHtml(StripTagsTransformer.stripTags(comment.getText())));
 	}
 	
 	protected void updateCurrentNumber(List<Comment> comments) {
