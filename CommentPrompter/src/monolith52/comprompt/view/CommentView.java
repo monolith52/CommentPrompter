@@ -23,9 +23,7 @@ import monolith52.comprompt.util.ThreadUtil;
 public class CommentView extends JPanel 
 		implements Runnable, CommentFoundListener, ModelChangedListener<CommentViewModel> {
 	private static final long serialVersionUID = 1L;
-	double rad = 0.0d;
 	int fps = 60;
-	long frameinterval = 1000 * 1000 * 1000 / fps;
 	int padding		= 5;
 	ViewStyle viewStyle;
 	
@@ -93,9 +91,9 @@ public class CommentView extends JPanel
 	@Override
 	public void run() {
 		isRunnable = true;
-		long lasttime, currenttime;
-		long sleeptime = 0;
+		long frameinterval, lasttime, currenttime, sleeptime;
 		while (isRunnable) {
+			frameinterval = 1000 * 1000 * 1000 / fps;
 			//　描画速度コントロール
 			lasttime = System.nanoTime();
 			synchronized (comments) {
@@ -118,7 +116,6 @@ public class CommentView extends JPanel
 	@Override
 	public void commentFound(List<Comment> newComments) {
 		int unitDistance = (font.getSize() + 10);
-//		int totalDistance = unitDistance * newComments.size();
 		newComments.forEach(comment -> {
 			System.out.println("New comment found: " + comment.getText());
 			comment.setAnimation(viewStyle.getCommentAnimation(comment));

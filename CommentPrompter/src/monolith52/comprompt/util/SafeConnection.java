@@ -21,7 +21,7 @@ public class SafeConnection {
 		// 指定したホスト外への攻撃防止
 		if (urlobj == null || 
 				urlobj.getHost() == null || !urlobj.getHost().endsWith(hostbase)) {
-			assert false: "invalid url";
+			throw new IOException("invalid url");
 		}
 		
 		// 誤ってループした場合の攻撃防止
@@ -33,7 +33,7 @@ public class SafeConnection {
 		con.connect();
 		
 		if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
-			assert false: "http error: " + con.getResponseCode();
+			throw new IOException("invalid http response code: " + con.getResponseCode());
 		}
 		
 		return IOUtils.toString(con.getInputStream(), encoding);
