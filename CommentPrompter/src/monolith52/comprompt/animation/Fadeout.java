@@ -20,8 +20,8 @@ public class Fadeout extends AnimationImpl {
 	}
 
 	@Override
-	public int getAlpha() {
-		return 0xFF - Math.min(0xFF, Math.max(0, currentStep) * 0xFF / maxStep());
+	public float getAlpha() {
+		return 1.0f - Math.min(1.0f, (float)Math.max(0, currentStep) / (float)maxStep());
 	}
 
 }

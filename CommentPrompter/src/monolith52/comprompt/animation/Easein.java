@@ -26,7 +26,7 @@ public class Easein extends AnimationImpl {
 	}
 
 	@Override
-	public int getAlpha() {
-		return Math.min(0xFF, currentStep * 0xFF / maxStep());
+	public float getAlpha() {
+		return Math.min(1.0f, (float)currentStep / (float)maxStep());
 	}
 }

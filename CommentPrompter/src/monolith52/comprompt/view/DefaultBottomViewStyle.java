@@ -14,26 +14,26 @@ public class DefaultBottomViewStyle extends ViewStyleImpl {
 	}
 	
 	@Override
-	public int getX(Comment comment, int index, int size) {
+	public int getX(Entry entry, int index, int size) {
 		return padding;
 	}
 
 	@Override
-	public int getY(Comment comment, int index, int size) {
-		return view.getHeight() - (size - index - 1) * getUnitHeight() - padding;
+	public int getY(Entry entry, int index, int size) {
+		return view.getHeight() - (size - index) * entry.getImage().getHeight(null) - padding;
 	}
 
 	@Override
-	public Animation getSlideAnimation() {
-		return new Easein(view.getFps(), 750, 0, getUnitHeight());
+	public Animation getSlideAnimation(Entry entry) {
+		return new Easein(view.getFps(), 750, 0, entry.getImage().getHeight(null));
 	}
 
 	@Override
-	public Animation getCommentAnimation(Comment comment) {
-		Animation easein = new Easein(view.getFps(), 750, 300, -getUnitHeight());
+	public Animation getEntryAnimation(Entry entry) {
+		Animation easein = new Easein(view.getFps(), 750, 300, - entry.getImage().getHeight(null));
 		Animation fadeout = new Fadeout(view.getFps(), 1000, 10000);
-		easein.setOnFinish(() -> comment.setAnimation(fadeout));
-		fadeout.setOnFinish(() -> comment.setGarbage(true));
+		easein.setOnFinish(() -> entry.setAnimation(fadeout));
+		fadeout.setOnFinish(() -> entry.setGarbage(true));
 		return easein;
 	}
 

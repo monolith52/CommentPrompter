@@ -4,7 +4,7 @@ public interface Animation {
 	public void step();
 	public int getX();
 	public int getY();
-	public int getAlpha();
+	public float getAlpha();
 	public void setOnFinish(Runnable onFinish);
 	public boolean isFinished();
 }
