@@ -10,7 +10,7 @@ import monolith52.comprompt.ModelChangedListener;
 public class CommentViewModel {
 	List<ModelChangedListener<CommentViewModel> > listeners = new ArrayList<ModelChangedListener<CommentViewModel> >();
 	
-	static final Font DEFAULT_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 20);
+	static final Font DEFAULT_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 32);
 	static final Color DEFAULT_FONT_COLOR = Color.black;
 	static final Color DEFAULT_BG_COLOR = Color.white;
 	static final ViewStyle DEFAULT_VIEW_STYLE = ViewStyleFactory.getInstanceFor(DefaultBottomViewStyle.ID);

@@ -3,7 +3,7 @@ package monolith52.comprompt;
 import java.awt.Dimension;
 
 public class ApplicationModel {
-	public final static Dimension DEFAULT_SIZE = new Dimension(400, 300);
+	public final static Dimension DEFAULT_SIZE = new Dimension(640, 480);
 	
 	Application app;
 	

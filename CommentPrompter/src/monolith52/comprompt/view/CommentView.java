@@ -21,7 +21,7 @@ public class CommentView extends JPanel
 		implements Runnable, CommentFoundListener, ModelChangedListener<CommentViewModel> {
 	private static final long serialVersionUID = 1L;
 	int fps = 60;
-	int padding		= 5;
+	int padding		= 2;
 	ViewStyle viewStyle;
 	
 	CommentViewModel model;
