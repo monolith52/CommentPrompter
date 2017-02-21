@@ -124,9 +124,7 @@ public class CommentView extends JPanel
 	
 	protected void rerenderAllEntries() {
 		synchronized (entries) {
-			entries.forEach(entry -> {
-				entry.setImage(EntryRenderer.render(entry.getComment().getText(), font, fontColor, padding));
-			});
+			entries.forEach(entry -> entry.getRenderer().run());
 		}
 	}
 
@@ -135,8 +133,10 @@ public class CommentView extends JPanel
 		newComments.forEach(comment -> {
 			System.out.println("New comment found: " + comment.getText());
 			Entry entry = new Entry();
-			entry.setComment(comment);
-			entry.setImage(EntryRenderer.render(comment.getText(), font, fontColor, padding));
+			entry.setRenderer(() -> {
+				entry.setImage(EntryRenderer.render(comment.getText(), font, fontColor, padding));
+			});
+			entry.getRenderer().run();
 			entry.setAnimation(viewStyle.getEntryAnimation(entry));
 			synchronized (entries) {
 				entries.add(entry);
