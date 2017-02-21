@@ -14,10 +14,12 @@ import javax.swing.TransferHandler;
 
 import monolith52.comprompt.config.ApplicationMenu;
 import monolith52.comprompt.config.Configure;
-import monolith52.comprompt.livetube.MonitoringListener;
-import monolith52.comprompt.livetube.MonitoringTask;
 import monolith52.comprompt.livetube.Streaming;
-import monolith52.comprompt.monitor.TcpMonitor;
+import monolith52.comprompt.livetube.StreamingListener;
+import monolith52.comprompt.livetube.StreamingTask;
+import monolith52.comprompt.monitor.MonitoringListener;
+import monolith52.comprompt.monitor.MonitoringTask;
+import monolith52.comprompt.monitor.TcpMonitoringTask;
 import monolith52.comprompt.view.CommentView;
 
 public class Application extends JFrame {
@@ -97,15 +99,12 @@ public class Application extends JFrame {
 			
 			System.out.println("Accept import data: " + data);
 			final String url = (String)data;
-			startUrlTask(url);
+			startStreamingTask(url);
 			return true;
 		}
 	}
-	
-	/**
-	 * コメント監視の成否に基づいて呼ばれるハンドラ
-	 */
-	class MonitoringHandler implements MonitoringListener {
+
+	class SteamingHandler implements StreamingListener {
 		@Override
 		public void streamingDetected(Streaming streaming) {
 			SwingUtilities.invokeLater(() -> {
@@ -118,6 +117,15 @@ public class Application extends JFrame {
 			SwingUtilities.invokeLater(() -> {
 				setTitle(formatTitle(msg, true));
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			});
+		}
+	}
+	
+	class MonitoringHandler implements MonitoringListener {
+		@Override
+		public void monitoringStarted(String msg) {
+			SwingUtilities.invokeLater(() -> {
+				setTitle(formatTitle(msg, false));
 			});
 		}
 		@Override
@@ -140,7 +148,11 @@ public class Application extends JFrame {
 		return buffer.toString();
 	}
 	
-	public void startUrlTask(String url) {
+	public void startStreamingTask(String url) {
+		StreamingTask streamingTask = new StreamingTask(url);
+		streamingTask.addEntryFoundListener(commentView);
+		streamingTask.addStreamingListener(new SteamingHandler());
+		streamingTask.addMonitoringListener(new MonitoringHandler());
 		synchronized (monitoringTaskLock) {
 			if (monitoringTask != null) {
 				monitoringTask.stop();
@@ -148,17 +160,22 @@ public class Application extends JFrame {
 			}
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			commentView.reset();
-			monitoringTask = new MonitoringTask(url);
-			monitoringTask.addCommentFoundListener(commentView);
-			monitoringTask.addMonitoringListener(new MonitoringHandler());
+			monitoringTask = streamingTask;		
+			new Thread(monitoringTask).start();
 		}
-		new Thread(monitoringTask).start();
 	}
 	
-	public void startMonitorTask(TcpMonitor monitor) {
-		// TODO: stop server if old one found
-		monitor.addFoundListneer(commentView);
-		new Thread(monitor).start();
+	public void startMonitoringTask(MonitoringTask task) {
+		task.addEntryFoundListneer(commentView);
+		synchronized (monitoringTaskLock) {
+			if (monitoringTask != null) {
+				monitoringTask.stop();
+				monitoringTask = null;
+			}
+			commentView.reset();
+			monitoringTask = task;		
+			new Thread(monitoringTask).start();
+		}
 	}
 	
 	public static void main(String[] args) {

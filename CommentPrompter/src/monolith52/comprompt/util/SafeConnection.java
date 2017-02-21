@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 public class SafeConnection {
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 	
+	// TODO: このメソッドはブロッキングするが明示的にブロックを解除することが出来ない 。connectionを返してclose出来るようにするべき
 	public static String getPage(String url, String hostbase, String encoding) throws IOException {
 		URL urlobj;
 		try {

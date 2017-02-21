@@ -11,14 +11,12 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import monolith52.comprompt.Comment;
 import monolith52.comprompt.ModelChangedListener;
 import monolith52.comprompt.animation.Animation;
-import monolith52.comprompt.livetube.CommentFoundListener;
 import monolith52.comprompt.util.ThreadUtil;
 
 public class CommentView extends JPanel 
-		implements Runnable, CommentFoundListener, ModelChangedListener<CommentViewModel> {
+		implements Runnable, EntryFoundListener, ModelChangedListener<CommentViewModel> {
 	private static final long serialVersionUID = 1L;
 	int fps = 60;
 	int padding		= 2;
@@ -30,8 +28,7 @@ public class CommentView extends JPanel
 	Color bgColor;
 
 	protected boolean isRunnable = false;
-//	protected List<Comment> comments = new LinkedList<Comment>();
-	protected List<Entry> entries = new LinkedList<Entry>();
+	protected List<RenderedEntry> renderedEntries = new LinkedList<RenderedEntry>();
 	protected List<Animation> slideAnimations = new LinkedList<Animation>();
 	
 	public CommentView(CommentViewModel model) {
@@ -67,10 +64,10 @@ public class CommentView extends JPanel
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
 		g.setFont(font);
-		synchronized (entries) {
-			for (int i=entries.size()-1; i>=0; i--) {
-				Entry entry = entries.get(i);
-				Animation ani = entry.getAnimation();
+		synchronized (renderedEntries) {
+			for (int i=renderedEntries.size()-1; i>=0; i--) {
+				RenderedEntry re = renderedEntries.get(i);
+				Animation ani = re.getAnimation();
 				
 				
 				Color color = new Color(fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue());
@@ -79,11 +76,11 @@ public class CommentView extends JPanel
 					slideAnimations.forEach(slide -> g.translate(slide.getX(), slide.getY()));
 					g.translate(ani.getX(), ani.getY());
 					
-					int x = viewStyle.getX(entry, i, entries.size());
-					int y = viewStyle.getY(entry, i, entries.size());
+					int x = viewStyle.getX(re, i, renderedEntries.size());
+					int y = viewStyle.getY(re, i, renderedEntries.size());
 //					g.drawString(comment.getText(), x, y);
 					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, ani.getAlpha()));
-					g.drawImage(entry.getImage(), x, y, null);
+					g.drawImage(re.getImage(), x, y, null);
 					
 					g.translate(-ani.getX(), -ani.getY());
 					slideAnimations.forEach(slide -> g.translate(-slide.getX(), -slide.getY()));
@@ -93,9 +90,9 @@ public class CommentView extends JPanel
 	}
 	
 	protected void process() {
-		synchronized (entries) {
-			entries.forEach(entry -> entry.getAnimation().step());
-			entries.removeIf(entry -> entry.isGarbage());
+		synchronized (renderedEntries) {
+			renderedEntries.forEach(entry -> entry.getAnimation().step());
+			renderedEntries.removeIf(entry -> entry.isGarbage());
 		}
 		synchronized (slideAnimations) {
 			slideAnimations.forEach(slide -> slide.step());
@@ -123,26 +120,26 @@ public class CommentView extends JPanel
 	}
 	
 	protected void rerenderAllEntries() {
-		synchronized (entries) {
-			entries.forEach(entry -> entry.getRenderer().run());
+		synchronized (renderedEntries) {
+			renderedEntries.forEach(entry -> entry.getRenderer().run());
 		}
 	}
 
 	@Override
-	public void commentFound(List<Comment> newComments) {
-		newComments.forEach(comment -> {
-			System.out.println("New comment found: " + comment.getText());
-			Entry entry = new Entry();
-			entry.setRenderer(() -> {
-				entry.setImage(EntryRenderer.render(comment.getText(), font, fontColor, padding));
+	public void entriesFound(List<Entry> newEntries) {
+		newEntries.forEach(entry -> {
+			System.out.println("New comment found: " + entry.getText());
+			RenderedEntry re = new RenderedEntry();
+			re.setRenderer(() -> {
+				re.setImage(EntryRenderer.render(entry.getText(), font, fontColor, padding));
 			});
-			entry.getRenderer().run();
-			entry.setAnimation(viewStyle.getEntryAnimation(entry));
-			synchronized (entries) {
-				entries.add(entry);
+			re.getRenderer().run();
+			re.setAnimation(viewStyle.getEntryAnimation(re));
+			synchronized (renderedEntries) {
+				renderedEntries.add(re);
 			}
 			synchronized (slideAnimations) {
-				slideAnimations.add(viewStyle.getSlideAnimation(entry));
+				slideAnimations.add(viewStyle.getSlideAnimation(re));
 			}
 			
 			ThreadUtil.sleep(100);
@@ -150,8 +147,8 @@ public class CommentView extends JPanel
 	}
 	
 	public void reset() {
-		synchronized (entries) {
-			entries.clear();
+		synchronized (renderedEntries) {
+			renderedEntries.clear();
 		}
 		synchronized (slideAnimations) {
 			slideAnimations.clear();

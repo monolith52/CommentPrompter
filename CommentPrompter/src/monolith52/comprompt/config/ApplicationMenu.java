@@ -26,7 +26,7 @@ import com.l2fprod.common.swing.JFontChooser;
 
 import monolith52.comprompt.Application;
 import monolith52.comprompt.ModelChangedListener;
-import monolith52.comprompt.monitor.TcpMonitor;
+import monolith52.comprompt.monitor.TcpMonitoringTask;
 import monolith52.comprompt.view.CommentViewModel;
 import monolith52.comprompt.view.ViewStyle;
 import monolith52.comprompt.view.ViewStyleFactory;
@@ -81,7 +81,7 @@ public class ApplicationMenu extends JMenuBar {
 		add(menu);
 		
 		item = new JMenuItem("TCPサーバ 52301番ポート");
-		item.addActionListener((e) -> app.startMonitorTask(new TcpMonitor(52301)));
+		item.addActionListener((e) -> app.startMonitoringTask(new TcpMonitoringTask(52301)));
 		menu.add(item);
 
 

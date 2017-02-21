@@ -4,27 +4,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MonitoringTask implements Runnable {
+import monolith52.comprompt.monitor.MonitoringTaskImpl;
+import monolith52.comprompt.view.EntryFoundListener;
+
+public class StreamingTask extends MonitoringTaskImpl {
 	boolean running = false;
 	String url;
 	CommentMonitor commentMonitor;
 	Object commentMonitorLock = new Object();
 	
-	List<CommentFoundListener> commentFoundListeners = new ArrayList<CommentFoundListener>();
-	List<MonitoringListener> monitoringListeners = new ArrayList<MonitoringListener>();
-	
-	public MonitoringTask(String url) {
+	List<EntryFoundListener> entryFoundListeners = new ArrayList<EntryFoundListener>();
+	List<StreamingListener> streamingListeners = new ArrayList<StreamingListener>();
+	public StreamingTask(String url) {
 		this.url = url;
 	}
 	
-	public void addCommentFoundListener(CommentFoundListener listener) {
-		commentFoundListeners.add(listener);
+	public void addEntryFoundListener(EntryFoundListener listener) {
+		entryFoundListeners.add(listener);
 	}
 	
-	public void addMonitoringListener(MonitoringListener listener) {
-		monitoringListeners.add(listener);
-	}
-	
+	public void addStreamingListener(StreamingListener listener) {
+		streamingListeners.add(listener);
+	}	
 	@Override
 	public void run() {
 		running = true;
@@ -35,21 +36,21 @@ public class MonitoringTask implements Runnable {
 			Streaming streaming = detector.detect();
 			if (!running) return;
 			
-			monitoringListeners.forEach(l -> l.streamingDetected(streaming));
+			streamingListeners.forEach(l -> l.streamingDetected(streaming));
 			
 			// コメントの取得
 			synchronized (commentMonitorLock) {
 				commentMonitor = new CommentMonitor(streaming.getId());
 				if (!running) return;
 			}
-			commentFoundListeners.forEach(commentMonitor::addCommentFoundListener);
+			entryFoundListeners.forEach(commentMonitor::addEntryFoundListener);
 			monitoringListeners.forEach(commentMonitor::addMonitoringListeners);
 
 			// すでにGUIスレッドではないのでコメントの取得は別スレッドでstartする必要がない
 			commentMonitor.run();
 			
 		} catch (IOException e) {
-			monitoringListeners.forEach(l -> l.detectionFailed(e.getMessage()));
+			streamingListeners.forEach(l -> l.detectionFailed(e.getMessage()));
 			return;
 		}
 	}

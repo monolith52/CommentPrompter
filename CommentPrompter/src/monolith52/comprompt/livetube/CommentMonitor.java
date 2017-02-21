@@ -12,10 +12,13 @@ import java.util.stream.Stream;
 import org.unbescape.html.HtmlEscape;
 
 import monolith52.comprompt.Comment;
+import monolith52.comprompt.monitor.MonitoringListener;
 import monolith52.comprompt.util.MatchUtil;
 import monolith52.comprompt.util.SafeConnection;
 import monolith52.comprompt.util.StripTagsTransformer;
 import monolith52.comprompt.util.ThreadUtil;
+import monolith52.comprompt.view.Entry;
+import monolith52.comprompt.view.EntryFoundListener;
 
 public class CommentMonitor implements Runnable {
 
@@ -32,15 +35,15 @@ public class CommentMonitor implements Runnable {
 	protected boolean running = false;
 	protected int currentNumber = 0;
 
-	protected List<CommentFoundListener> commentFoundListeners = new ArrayList<CommentFoundListener>();
+	protected List<EntryFoundListener> entryFoundListeners = new ArrayList<EntryFoundListener>();
 	protected List<MonitoringListener> monitoringListeners = new ArrayList<MonitoringListener>();
 	
 	public CommentMonitor(String id) {
 		this.id = id;
 	}
 	
-	public void addCommentFoundListener(CommentFoundListener listener) {
-		commentFoundListeners.add(listener);
+	public void addEntryFoundListener(EntryFoundListener listener) {
+		entryFoundListeners.add(listener);
 	}
 
 	public void addMonitoringListeners(MonitoringListener listener) {
@@ -79,8 +82,10 @@ public class CommentMonitor implements Runnable {
 		return comments;
 	}
 	
-	private void transformComment(Comment comment) {
-		comment.setText(HtmlEscape.unescapeHtml(StripTagsTransformer.stripTags(comment.getText())));
+	private Entry toEntry(Comment comment) {
+		Entry entry = new Entry();
+		entry.setText(HtmlEscape.unescapeHtml(StripTagsTransformer.stripTags(comment.getText())));
+		return entry;
 	}
 	
 	protected void updateCurrentNumber(List<Comment> comments) {
@@ -96,6 +101,7 @@ public class CommentMonitor implements Runnable {
 	@Override
 	public void run() {
 		running = true;
+		
 		while (running) {
 			try {
 				String response = SafeConnection.getPage(getTargetUrl(id), HOST, ENCODING);
@@ -112,10 +118,11 @@ public class CommentMonitor implements Runnable {
 				updateCurrentNumber(comments);
 				
 				// 表示用の加工を行う
-				comments.forEach(this::transformComment);
+				List<Entry> entries = new ArrayList<Entry>();
+				comments.forEach(comment -> entries.add(toEntry(comment)));
 				
 				// 一括通知
-				commentFoundListeners.forEach(listener -> listener.commentFound(comments));
+				entryFoundListeners.forEach(listener -> listener.entriesFound(entries));
 				
 				ThreadUtil.sleep(3000);
 			} catch (IOException e) {
