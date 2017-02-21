@@ -18,6 +18,7 @@ import monolith52.comprompt.util.ThreadUtil;
 public class CommentView extends JPanel 
 		implements Runnable, EntryFoundListener, ModelChangedListener<CommentViewModel> {
 	private static final long serialVersionUID = 1L;
+	boolean resetFlag = false;
 	int fps = 60;
 	int padding		= 2;
 	ViewStyle viewStyle;
@@ -127,7 +128,9 @@ public class CommentView extends JPanel
 
 	@Override
 	public void entriesFound(List<Entry> newEntries) {
+		resetFlag = false;
 		newEntries.forEach(entry -> {
+			if (resetFlag) return;
 			System.out.println("New comment found: " + entry.getText());
 			RenderedEntry re = new RenderedEntry();
 			re.setRenderer(() -> {
@@ -147,6 +150,7 @@ public class CommentView extends JPanel
 	}
 	
 	public void reset() {
+		resetFlag = true;
 		synchronized (renderedEntries) {
 			renderedEntries.clear();
 		}

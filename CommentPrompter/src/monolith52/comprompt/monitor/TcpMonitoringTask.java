@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import monolith52.comprompt.view.Entry;
-import monolith52.comprompt.view.EntryFoundListener;
 
 public class TcpMonitoringTask extends MonitoringTaskImpl {
 

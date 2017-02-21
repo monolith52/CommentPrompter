@@ -19,7 +19,6 @@ import monolith52.comprompt.livetube.StreamingListener;
 import monolith52.comprompt.livetube.StreamingTask;
 import monolith52.comprompt.monitor.MonitoringListener;
 import monolith52.comprompt.monitor.MonitoringTask;
-import monolith52.comprompt.monitor.TcpMonitoringTask;
 import monolith52.comprompt.view.CommentView;
 
 public class Application extends JFrame {
@@ -149,10 +148,10 @@ public class Application extends JFrame {
 	}
 	
 	public void startStreamingTask(String url) {
-		StreamingTask streamingTask = new StreamingTask(url);
-		streamingTask.addEntryFoundListener(commentView);
-		streamingTask.addStreamingListener(new SteamingHandler());
-		streamingTask.addMonitoringListener(new MonitoringHandler());
+		StreamingTask task = new StreamingTask(url);
+		task.addEntryFoundListener(commentView);
+		task.addStreamingListener(new SteamingHandler());
+		task.addMonitoringListener(new MonitoringHandler());
 		synchronized (monitoringTaskLock) {
 			if (monitoringTask != null) {
 				monitoringTask.stop();
@@ -160,13 +159,14 @@ public class Application extends JFrame {
 			}
 			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			commentView.reset();
-			monitoringTask = streamingTask;		
+			monitoringTask = task;		
 			new Thread(monitoringTask).start();
 		}
 	}
 	
 	public void startMonitoringTask(MonitoringTask task) {
 		task.addEntryFoundListneer(commentView);
+		task.addMonitoringListener(new MonitoringHandler());
 		synchronized (monitoringTaskLock) {
 			if (monitoringTask != null) {
 				monitoringTask.stop();
