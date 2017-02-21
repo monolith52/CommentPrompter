@@ -24,18 +24,22 @@ import javax.swing.SwingUtilities;
 import com.l2fprod.common.swing.BaseDialog;
 import com.l2fprod.common.swing.JFontChooser;
 
+import monolith52.comprompt.Application;
 import monolith52.comprompt.ModelChangedListener;
+import monolith52.comprompt.monitor.TcpMonitor;
 import monolith52.comprompt.view.CommentViewModel;
 import monolith52.comprompt.view.ViewStyle;
 import monolith52.comprompt.view.ViewStyleFactory;
 
 public class ApplicationMenu extends JMenuBar {
 	private static final long serialVersionUID = 1L;
+	Application app;
 	Configure config;
 	List<JMenuItem> viewStyleMenuItems = new ArrayList<JMenuItem>();
 	
-	public ApplicationMenu(Configure config) {
+	public ApplicationMenu(Application app, Configure config) {
 		super();
+		this.app = app;
 		this.config = config;
 		config.getCommentViewModel().addChangeListener(new ModelChangedHandler());
 	}
@@ -71,6 +75,15 @@ public class ApplicationMenu extends JMenuBar {
 			viewStyleMenuItems.add(sub);
 		});
 		menu.add(viewMenu);
+		
+		
+		menu = new JMenu("機能");
+		add(menu);
+		
+		item = new JMenuItem("TCPサーバ 52301番ポート");
+		item.addActionListener((e) -> app.startMonitorTask(new TcpMonitor(52301)));
+		menu.add(item);
+
 
 		updateViewStyleToggle(config.getCommentViewModel().getViewStyle());
 	}

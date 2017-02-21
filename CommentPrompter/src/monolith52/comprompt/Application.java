@@ -17,6 +17,7 @@ import monolith52.comprompt.config.Configure;
 import monolith52.comprompt.livetube.MonitoringListener;
 import monolith52.comprompt.livetube.MonitoringTask;
 import monolith52.comprompt.livetube.Streaming;
+import monolith52.comprompt.monitor.TcpMonitor;
 import monolith52.comprompt.view.CommentView;
 
 public class Application extends JFrame {
@@ -52,7 +53,7 @@ public class Application extends JFrame {
 		add(commentView);
 		new Thread(commentView).start();
 
-		menu = new ApplicationMenu(config);
+		menu = new ApplicationMenu(this, config);
 		menu.init();
 		setJMenuBar(menu);
 
@@ -96,7 +97,7 @@ public class Application extends JFrame {
 			
 			System.out.println("Accept import data: " + data);
 			final String url = (String)data;
-			startTask(url);
+			startUrlTask(url);
 			return true;
 		}
 	}
@@ -139,7 +140,7 @@ public class Application extends JFrame {
 		return buffer.toString();
 	}
 	
-	public void startTask(String url) {
+	public void startUrlTask(String url) {
 		synchronized (monitoringTaskLock) {
 			if (monitoringTask != null) {
 				monitoringTask.stop();
@@ -152,6 +153,12 @@ public class Application extends JFrame {
 			monitoringTask.addMonitoringListener(new MonitoringHandler());
 		}
 		new Thread(monitoringTask).start();
+	}
+	
+	public void startMonitorTask(TcpMonitor monitor) {
+		// TODO: stop server if old one found
+		monitor.addFoundListneer(commentView);
+		new Thread(monitor).start();
 	}
 	
 	public static void main(String[] args) {

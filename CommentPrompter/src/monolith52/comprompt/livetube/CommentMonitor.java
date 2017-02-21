@@ -29,7 +29,7 @@ public class CommentMonitor implements Runnable {
 	protected final static Pattern PATTERN_TEXT 	= Pattern.compile("<span style=\"font-weight:bold;margin-bottom:0px; padding-bottom:0px;\">(.*)</span><br clear=\"left\" />");
 	
 	protected String id;
-	protected boolean isRunning = false;
+	protected boolean running = false;
 	protected int currentNumber = 0;
 
 	protected List<CommentFoundListener> commentFoundListeners = new ArrayList<CommentFoundListener>();
@@ -95,11 +95,11 @@ public class CommentMonitor implements Runnable {
 
 	@Override
 	public void run() {
-		isRunning = true;
-		while (isRunning) {
+		running = true;
+		while (running) {
 			try {
 				String response = SafeConnection.getPage(getTargetUrl(id), HOST, ENCODING);
-				if (!isRunning) break;
+				if (!running) break;
 				
 				List<Comment> fullCommnets = parseComments(response);
 				
@@ -129,6 +129,6 @@ public class CommentMonitor implements Runnable {
 	
 	public void stop() {
 		System.out.println("Stopping monitor for: " + id);
-		isRunning = false;
+		running = false;
 	}
 }
