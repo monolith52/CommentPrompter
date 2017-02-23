@@ -37,7 +37,7 @@ public class TcpMonitoringTask extends MonitoringTaskImpl {
 			return;
 		}
 		
-		System.out.println("started server for: " + port);
+		System.out.println(String.format("started server %s for: %s", Thread.currentThread(), port));
 		monitoringListeners.forEach(l -> l.monitoringStarted("TCP port " + port));
 		while (running) {
 			try {
@@ -90,10 +90,10 @@ public class TcpMonitoringTask extends MonitoringTaskImpl {
 			running = true;
 			
 			if (checkRejection()) {
-				System.out.println("Rejected reciever from: " + this);
+				System.out.println(String.format("Rejected reciever %s from: %s", Thread.currentThread(), this));
 			}
 			
-			System.out.println("Started reciever from: " + this);
+			System.out.println(String.format("Started reciever %s from: %s", Thread.currentThread(), this));
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), ENCODING))) {
 				String line;
 				while ((line = br.readLine()) != null) {

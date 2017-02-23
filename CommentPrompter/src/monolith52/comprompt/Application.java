@@ -97,8 +97,7 @@ public class Application extends JFrame {
 			}
 			
 			System.out.println("Accept import data: " + data);
-			final String url = (String)data;
-			startStreamingTask(url);
+			startStreamingTask((String)data);
 			return true;
 		}
 	}
@@ -148,6 +147,7 @@ public class Application extends JFrame {
 	}
 	
 	public void startStreamingTask(String url) {
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		StreamingTask task = new StreamingTask(url);
 		task.addEntryFoundListener(commentView);
 		task.addStreamingListener(new SteamingHandler());
@@ -155,11 +155,9 @@ public class Application extends JFrame {
 		synchronized (monitoringTaskLock) {
 			if (monitoringTask != null) {
 				monitoringTask.stop();
-				monitoringTask = null;
 			}
-			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			commentView.reset();
 			monitoringTask = task;		
+			commentView.reset();
 			new Thread(monitoringTask).start();
 		}
 	}
@@ -170,10 +168,9 @@ public class Application extends JFrame {
 		synchronized (monitoringTaskLock) {
 			if (monitoringTask != null) {
 				monitoringTask.stop();
-				monitoringTask = null;
 			}
-			commentView.reset();
 			monitoringTask = task;		
+			commentView.reset();
 			new Thread(monitoringTask).start();
 		}
 	}
@@ -182,6 +179,7 @@ public class Application extends JFrame {
 		SwingUtilities.invokeLater(() -> {
 			Application app = new Application();
 			app.init();
+			if (args.length > 0) app.startStreamingTask(args[0]);
 		});
 	}
 
