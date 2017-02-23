@@ -26,12 +26,12 @@ public class EntryRenderer {
 		Rectangle2D rect = font.getStringBounds(str, frc);
 		BufferedImage image = createTransparentImage(
 				Math.min((int)rect.getWidth() + padding * 2, getDisplayWidth()),
-				(int)rect.getHeight() + padding * 2);
+				(int)rect.getHeight());
 		Graphics2D g2d = image.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasHint);
 		g2d.setColor(color);
 		g2d.setFont(font);
-		g2d.drawString(str, (float)padding, (float)(padding - rect.getY()));
+		g2d.drawString(str, (float)padding, (float)(- rect.getY()));
 		
 		g2d.dispose();
 		return image;
