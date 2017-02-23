@@ -5,7 +5,11 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
 import javax.swing.JFrame;
@@ -23,11 +27,15 @@ import monolith52.comprompt.view.CommentView;
 
 public class Application extends JFrame {
 	private static final long serialVersionUID = 1L;
+	
+	protected final static File LAUNCH_LOCK_FILE = new File(".CommentPrompter.lock");
 	protected final static DataFlavor IMPORTABLE_FLAVOR = new DataFlavor(String.class, "text/plain");
 	protected final static String TITLE = "Comment Prompter";
 	protected final static String TITLE_SUCCESS = " > ";
 	protected final static String TITLE_FAILED = " [停止中] ";
 	
+	FileChannel lockFileChannel;
+	FileLock lockFileLock;
 	Configure config;
 	ApplicationMenu menu;
 	CommentView commentView;
@@ -61,11 +69,40 @@ public class Application extends JFrame {
 		setTransferHandler(new DropHandler());
 	}
 	
+	public boolean tryLockForLaunch() {
+		try {
+			lockFileChannel = FileChannel.open(LAUNCH_LOCK_FILE.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			LAUNCH_LOCK_FILE.deleteOnExit();
+			lockFileLock = lockFileChannel.tryLock();
+			if (lockFileLock == null) return false;
+			return true;
+		} catch (IOException e) {
+			try {
+				if (lockFileChannel != null) lockFileChannel.close();
+				return false;
+			} catch (IOException ee) {
+				return false;
+			}
+		}
+	}
+	
+	public void unlockForLaunch() {
+		try {
+			if (lockFileLock != null) lockFileLock.release();
+		} catch (IOException e) {}
+		try {
+		if (lockFileChannel != null) lockFileChannel.close();
+		} catch (IOException e) {}
+	}
+	
 	protected class WindowHandler extends WindowAdapter {
 		@Override
 		public void windowClosing(WindowEvent event) {
 			// アプリケーション終了前にウインドウサイズを設定ファイルに保存する
 			config.save();
+			
+			// 起動ロックを解除
+			unlockForLaunch();
 			
 			super.windowClosing(event);
 		}
@@ -178,6 +215,11 @@ public class Application extends JFrame {
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> {
 			Application app = new Application();
+			// 起動ロックを確保できなければ終了
+			if (!app.tryLockForLaunch()) {
+				System.out.println("Application exited due to double launching");
+				return;
+			}
 			app.init();
 			if (args.length > 0) app.startStreamingTask(args[0]);
 		});
