@@ -36,6 +36,8 @@ public class ApplicationMenu extends JMenuBar {
 	Application app;
 	Configure config;
 	List<JMenuItem> viewStyleMenuItems = new ArrayList<JMenuItem>();
+	JMenuItem antialiasOnItem;
+	JMenuItem antialiasOffItem;
 	
 	public ApplicationMenu(Application app, Configure config) {
 		super();
@@ -76,6 +78,20 @@ public class ApplicationMenu extends JMenuBar {
 		});
 		menu.add(viewMenu);
 		
+		JMenu antialiasMenu = new JMenu("アンチエイリアス");
+		antialiasOnItem = new JMenuItem("オン");
+		antialiasOnItem.addActionListener((e) -> {
+			commentViewModel.setAntialias(true);
+			config.save();
+		});
+		antialiasMenu.add(antialiasOnItem);
+		antialiasOffItem = new JMenuItem("オフ");
+		antialiasOffItem.addActionListener((e) -> {
+			commentViewModel.setAntialias(false);
+			config.save();
+		});
+		antialiasMenu.add(antialiasOffItem);
+		menu.add(antialiasMenu);
 		
 		menu = new JMenu("機能");
 		add(menu);
@@ -85,7 +101,8 @@ public class ApplicationMenu extends JMenuBar {
 		menu.add(item);
 
 
-		updateViewStyleToggle(config.getCommentViewModel().getViewStyle());
+		updateViewStyleToggle(commentViewModel.getViewStyle());
+		updateAntialiasToggle(commentViewModel.isAntialias());
 	}
 	
 	protected class FontItemAction implements ActionListener {
@@ -154,10 +171,18 @@ public class ApplicationMenu extends JMenuBar {
 			item.setEnabled(!viewStyle.getId().equals(item.getText()));
 		});
 	}
+
+	public void updateAntialiasToggle(boolean antialias) {
+		antialiasOnItem.setEnabled(!antialias);
+		antialiasOffItem.setEnabled(antialias);
+	}
 	
 	class ModelChangedHandler implements ModelChangedListener<CommentViewModel> {
 		public void modelChanged(CommentViewModel model) {
-			SwingUtilities.invokeLater(() -> updateViewStyleToggle(model.getViewStyle()));
+			SwingUtilities.invokeLater(() -> {
+				updateViewStyleToggle(model.getViewStyle());
+				updateAntialiasToggle(model.isAntialias());
+			});
 		}
 	}
 }

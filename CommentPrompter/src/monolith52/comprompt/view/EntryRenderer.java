@@ -15,23 +15,24 @@ public class EntryRenderer {
 		return (int)GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getWidth();
 	}
 	
-	public static BufferedImage render(String str, Font font, Color color, int padding) {
-		BufferedImage dummy = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D dg = dummy.createGraphics();
-		dg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		FontRenderContext frc = dg.getFontMetrics(font).getFontRenderContext();
+	public static BufferedImage render(String str, Font font, Color color, int padding, boolean antialias) {
+		Object antialiasHint = antialias ?
+				RenderingHints.VALUE_ANTIALIAS_ON :
+				RenderingHints.VALUE_ANTIALIAS_OFF;
+		FontRenderContext frc = new FontRenderContext(null, 
+				RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT , 
+				RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
 		
 		Rectangle2D rect = font.getStringBounds(str, frc);
 		BufferedImage image = createTransparentImage(
 				Math.min((int)rect.getWidth() + padding * 2, getDisplayWidth()),
 				(int)rect.getHeight() + padding * 2);
 		Graphics2D g2d = image.createGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antialiasHint);
 		g2d.setColor(color);
 		g2d.setFont(font);
 		g2d.drawString(str, (float)padding, (float)(padding - rect.getY()));
 		
-		dg.dispose();
 		g2d.dispose();
 		return image;
 	}

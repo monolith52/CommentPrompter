@@ -14,11 +14,13 @@ public class CommentViewModel {
 	static final Color DEFAULT_FONT_COLOR = Color.black;
 	static final Color DEFAULT_BG_COLOR = Color.white;
 	static final ViewStyle DEFAULT_VIEW_STYLE = ViewStyleFactory.getInstanceFor(DefaultBottomViewStyle.ID);
+	static final boolean DEFAULT_ANTIALIAS = true;
 
 	Font font 		= DEFAULT_FONT;
 	Color fontColor = DEFAULT_FONT_COLOR;
 	Color bgColor 	= DEFAULT_BG_COLOR;
 	ViewStyle viewStyle = DEFAULT_VIEW_STYLE;
+	boolean antialias = DEFAULT_ANTIALIAS;
 	
 	public void addChangeListener(ModelChangedListener<CommentViewModel> listener) {
 		listeners.add(listener);
@@ -61,6 +63,15 @@ public class CommentViewModel {
 
 	public void setViewStyle(ViewStyle viewStyle) {
 		this.viewStyle = viewStyle;
+		stateChanged();
+	}
+
+	public boolean isAntialias() {
+		return antialias;
+	}
+
+	public void setAntialias(boolean antialias) {
+		this.antialias = antialias;
 		stateChanged();
 	}
 }

@@ -27,6 +27,7 @@ public class CommentView extends JPanel
 	Font font;
 	Color fontColor;
 	Color bgColor;
+	boolean antialias;
 
 	protected boolean isRunnable = false;
 	protected List<RenderedEntry> renderedEntries = new LinkedList<RenderedEntry>();
@@ -44,6 +45,7 @@ public class CommentView extends JPanel
 		bgColor 	= model.getBgColor();
 		model.getViewStyle().setCommentView(this); 
 		viewStyle	= model.getViewStyle();
+		antialias	= model.isAntialias();
 		rerenderAllEntries();
 	}
 	
@@ -58,8 +60,6 @@ public class CommentView extends JPanel
 	@Override
 	protected void paintComponent(Graphics g1) {
 		Graphics2D g = (Graphics2D)g1;
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-                RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		g.setColor(bgColor);
 		g.fillRect(0, 0, getWidth(), getHeight());
@@ -134,7 +134,7 @@ public class CommentView extends JPanel
 			System.out.println("New comment found: " + entry.getText());
 			RenderedEntry re = new RenderedEntry();
 			re.setRenderer(() -> {
-				re.setImage(EntryRenderer.render(entry.getText(), font, fontColor, padding));
+				re.setImage(EntryRenderer.render(entry.getText(), font, fontColor, padding, antialias));
 			});
 			re.getRenderer().run();
 			re.setAnimation(viewStyle.getEntryAnimation(re));

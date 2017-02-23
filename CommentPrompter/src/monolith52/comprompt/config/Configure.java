@@ -51,6 +51,7 @@ public class Configure {
 			config.setProperty("fontColor", ColorUtil.toString(cvm.getFontColor()));
 			config.setProperty("bgColor", ColorUtil.toString(cvm.getBgColor()));
 			config.setProperty("viewStyle", cvm.getViewStyle().getId());
+			config.setProperty("antialias", cvm.isAntialias());
 			
 			config.setProperty("windowWidth", apm.getWindowWidth());
 			config.setProperty("windowHeight", apm.getWindowHeight());
@@ -89,6 +90,7 @@ public class Configure {
 				ViewStyleFactory.getInstanceFor(
 						config.getString("viewStyle", cvm.getViewStyle().getId()),
 						cvm.getViewStyle()));
+		cvm.setAntialias(config.getBoolean("antialias", cvm.isAntialias()));
 		
 		apm.setWindowWidth(config.getInt("windowWidth", apm.getWindowWidth()));
 		apm.setWindowHeight(config.getInt("windowHeight", apm.getWindowHeight()));
