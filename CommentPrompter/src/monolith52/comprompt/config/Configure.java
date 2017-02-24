@@ -55,6 +55,7 @@ public class Configure {
 			
 			config.setProperty("windowWidth", apm.getWindowWidth());
 			config.setProperty("windowHeight", apm.getWindowHeight());
+			config.setProperty("tcpServerPort", apm.getTcpServerPort());
 			
 			builder.save();
 		} catch (org.apache.commons.configuration2.ex.ConfigurationException e) {
@@ -94,6 +95,7 @@ public class Configure {
 		
 		apm.setWindowWidth(config.getInt("windowWidth", apm.getWindowWidth()));
 		apm.setWindowHeight(config.getInt("windowHeight", apm.getWindowHeight()));
+		apm.setTcpServerPort(config.getInt("tcpServerPort", apm.getTcpServerPort()));
 	}
 	
 	protected void copyInitialFile() {

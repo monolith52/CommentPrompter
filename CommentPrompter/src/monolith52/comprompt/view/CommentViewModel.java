@@ -36,7 +36,6 @@ public class CommentViewModel {
 
 	public void setFont(Font font) {
 		this.font = font;
-		stateChanged();
 	}
 
 	public Color getFontColor() {
@@ -45,7 +44,6 @@ public class CommentViewModel {
 
 	public void setFontColor(Color fontColor) {
 		this.fontColor = fontColor;
-		stateChanged();
 	}
 
 	public Color getBgColor() {
@@ -54,7 +52,6 @@ public class CommentViewModel {
 
 	public void setBgColor(Color bgColor) {
 		this.bgColor = bgColor;
-		stateChanged();
 	}
 
 	public ViewStyle getViewStyle() {
@@ -63,7 +60,6 @@ public class CommentViewModel {
 
 	public void setViewStyle(ViewStyle viewStyle) {
 		this.viewStyle = viewStyle;
-		stateChanged();
 	}
 
 	public boolean isAntialias() {
@@ -72,6 +68,5 @@ public class CommentViewModel {
 
 	public void setAntialias(boolean antialias) {
 		this.antialias = antialias;
-		stateChanged();
 	}
 }
